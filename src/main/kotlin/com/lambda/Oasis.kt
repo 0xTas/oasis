@@ -1,11 +1,11 @@
 package com.lambda
 
+import java.util.*
 import com.lambda.modules.*
 import com.lambda.huds.NotepadHud
+import com.lambda.commands.SegFault
 import com.lambda.modules.SignatureSign
 import com.lambda.client.plugin.api.Plugin
-import com.lambda.commands.SegFault
-import java.util.*
 
 
 internal object Oasis : Plugin() {

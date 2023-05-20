@@ -1,17 +1,17 @@
 package com.lambda.modules
 
 import com.lambda.Oasis
-import com.lambda.client.event.LambdaEventBus
-import com.lambda.client.event.events.ConnectionEvent
 import net.minecraft.block.BlockSign
 import net.minecraft.client.Minecraft
 import net.minecraft.util.math.BlockPos
 import com.lambda.client.module.Category
+import com.lambda.client.event.LambdaEventBus
 import net.minecraft.tileentity.TileEntitySign
 import com.lambda.client.plugin.api.PluginModule
+import com.lambda.client.util.threads.safeListener
 import com.lambda.client.util.threads.BackgroundJob
 import com.lambda.client.util.text.MessageSendHelper
-import com.lambda.client.util.threads.safeListener
+import com.lambda.client.event.events.ConnectionEvent
 
 
 internal object ChatSigns : PluginModule(
