@@ -25,7 +25,7 @@ import net.minecraft.network.play.client.CPacketUpdateSign
 internal object SignatureSign : PluginModule(
     name = "Signature Sign",
     category = Category.MISC,
-    description = "AutoFill signs with custom text.",
+    description = "AutoFill signs with custom text",
     pluginMain = Oasis
 ) {
     private val mode by setting("Mode", value = Mode.TEMPLATE)
@@ -43,10 +43,10 @@ internal object SignatureSign : PluginModule(
         value = 2000,
         range = 0..5000,
         step = 1,
-        description = "Delay the packet to increase chance of acceptance."
+        description = "Delay the packet to increase chance of acceptance"
     )
-    private val autoDisable by setting("Auto Disable", value = true, description = "Disable after placing a sign.")
-    private val verbose by setting("Verbose", value = false, description = "Prints confirmation messages in the chat.")
+    private val autoDisable by setting("Auto Disable", value = false, description = "Disable after placing a sign")
+    private val verbose by setting("Verbose", value = false, description = "Prints confirmation messages in the chat")
 
     private val mc = Minecraft.getMinecraft()
 
@@ -80,69 +80,8 @@ internal object SignatureSign : PluginModule(
                     for (i in 0 until text.count()) {
                         if (i >= 4)
                             break
-
-                        if (i == 0 && line1Mode == LineMode.BASE64) {
-                            signText.add(BaseEncoding.base64().encode(text[i].take(13).toByteArray()))
-                        } else if (i == 0 && line1Mode == LineMode.BASE32) {
-                            signText.add(BaseEncoding.base32().encode(text[i].take(10).toByteArray()))
-                        } else if (i == 0 && line1Mode == LineMode.ZxHEX) {
-                            signText.add("0x${text[i].take(8).toByteArray().toHex()}")
-                        } else if (i == 0 && line1Mode == LineMode.HEX) {
-                            signText.add(text[i].take(9).toByteArray().toHex())
-                        } else if (i == 0 && line1Mode == LineMode.ROT13) {
-                            signText.add(rot13(text[i].take(18)))
-                        } else if (i == 0 && line1Mode == LineMode.ROT47) {
-                            signText.add(rot47(text[i].take(18)))
-                        } else if (i == 0)
-                            signText.add(text[i].take(18))
-
-                        if (i == 1 && line2Mode == LineMode.BASE64) {
-                            signText.add(BaseEncoding.base64().encode(text[i].take(13).toByteArray()))
-                        } else if (i == 1 && line2Mode == LineMode.BASE32) {
-                            signText.add(BaseEncoding.base32().encode(text[i].take(10).toByteArray()))
-                        } else if (i == 1 && line2Mode == LineMode.ZxHEX) {
-                            signText.add("0x${text[i].take(8).toByteArray().toHex()}")
-                        } else if (i == 1 && line2Mode == LineMode.HEX) {
-                            signText.add(text[i].take(9).toByteArray().toHex())
-                        } else if (i == 1 && line2Mode == LineMode.ROT13) {
-                            signText.add(rot13(text[i].take(18)))
-                        } else if (i == 1 && line2Mode == LineMode.ROT47) {
-                            signText.add(rot47(text[i].take(18)))
-                        } else if (i == 1)
-                            signText.add(text[i].take(18))
-
-                        if (i == 2 && line3Mode == LineMode.BASE64) {
-                            signText.add(BaseEncoding.base64().encode(text[i].take(13).toByteArray()))
-                        } else if (i == 2 && line3Mode == LineMode.BASE32) {
-                            signText.add(BaseEncoding.base32().encode(text[i].take(10).toByteArray()))
-                        } else if (i == 2 && line3Mode == LineMode.ZxHEX) {
-                            signText.add("0x${text[i].take(8).toByteArray().toHex()}")
-                        } else if (i == 2 && line3Mode == LineMode.HEX) {
-                            signText.add(text[i].take(9).toByteArray().toHex())
-                        } else if (i == 2 && line3Mode == LineMode.ROT13) {
-                            signText.add(rot13(text[i].take(18)))
-                        } else if (i == 2 && line3Mode == LineMode.ROT47) {
-                            signText.add(rot47(text[i].take(18)))
-                        } else if (i == 2)
-                            signText.add(text[i].take(18))
-
-                        if (i == 3 && line4Mode == LineMode.BASE64) {
-                            signText.add(BaseEncoding.base64().encode(text[i].take(13).toByteArray()))
-                        } else if (i == 3 && line4Mode == LineMode.BASE32) {
-                            signText.add(BaseEncoding.base32().encode(text[i].take(10).toByteArray()))
-                        } else if (i == 3 && line4Mode == LineMode.ZxHEX) {
-                            signText.add("0x${text[i].take(8).toByteArray().toHex()}")
-                        } else if (i == 3 && line4Mode == LineMode.HEX) {
-                            signText.add(text[i].take(9).toByteArray().toHex())
-                        } else if (i == 3 && line4Mode == LineMode.ROT13) {
-                            signText.add(rot13(text[i].take(18)))
-                        } else if (i == 3 && line4Mode == LineMode.ROT47) {
-                            signText.add(rot47(text[i].take(18)))
-                        } else if (i == 3)
-                            signText.add(text[i].take(18))
+                        signText.add(text[i].take(18))
                     }
-                    if (verbose)
-                        MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §fRead from file into outbound §2CPacketUpdateSign §fpacket.")
                 } else {
                     signText.add("File not found.")
                     signText.add("Please create a")
@@ -319,6 +258,9 @@ internal object SignatureSign : PluginModule(
             packet.cancel()
             if (mode == Mode.TEMPLATE && verbose)
                 MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §fSending templated §2CPacketUpdateSign §fto the server.")
+
+            if (mode == Mode.READ_FROM_FILE && verbose)
+                MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §fRead from file into outbound §2CPacketUpdateSign §fpacket.")
 
             if (autoDisable)
                 disable()
