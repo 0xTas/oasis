@@ -15,12 +15,10 @@ import com.lambda.client.util.threads.safeListener
 import com.lambda.client.util.threads.BackgroundJob
 import com.lambda.client.event.events.PlayerMoveEvent
 import net.minecraft.network.play.client.CPacketPlayer
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import com.lambda.client.mixin.extension.playerIsOnGround
 import com.lambda.client.util.EntityUtils.flooredPosition
 import net.minecraft.network.play.server.SPacketPlayerPosLook
 import com.lambda.client.event.events.AddCollisionBoxToListEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 
 // Credit to the writers/contributors of the Jesus module in Lambda 3.3 for the starting point
@@ -33,7 +31,6 @@ object EntityJesus : PluginModule(
     private var fakeY = 0.0
     private var toLand = true
     private var interval = false
-    private var ticksEnabled = 0
 
     // Prevent fall distance from building up and thanos-snapping your poor horse upon returning to land
     val job = BackgroundJob("EntityJesus", 2500) {
@@ -45,13 +42,7 @@ object EntityJesus : PluginModule(
     init {
         onDisable {
             toLand = true
-            ticksEnabled = 0
             fakeY = .0
-        }
-
-        safeListener<ClientTickEvent> {
-            if (it.phase != TickEvent.Phase.START) return@safeListener
-            ticksEnabled++
         }
 
         safeListener<AddCollisionBoxToListEvent> {
