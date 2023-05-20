@@ -1,0 +1,11 @@
+{
+  "name": "Oasis",
+  "version": "${version}",
+  "description": "A collection of custom modules for Lambda.",
+  "url": "https://github.com/0xTas/oasis",
+  "authors": [ "Zach (0xTas) <root@0xTas.dev>"],
+  "main_class": "com.lambda.Oasis",
+  "min_api_version": "3.3",
+  "mixins": [],
+  "required_plugins": []
+}

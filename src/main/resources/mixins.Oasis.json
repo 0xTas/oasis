@@ -1,0 +1,7 @@
+{
+  "required": false,
+  "compatibilityLevel": "JAVA_8",
+  "package": "com.lambda.mixins",
+  "refmap": "mixins.Oasis.refmap.json",
+  "client": []
+}
