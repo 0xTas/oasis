@@ -27,18 +27,16 @@ It includes a collection of custom modules designed for use on the anarchy serve
 4. You're all set!
 ---
 ### What's Next?
-I plan to support this plugin for the foreseeable future, as I get regular use out of it myself.
-<br>
-New modules may be added from time-to-time as I think of them and get them to a shareable state.
-<br>
+
+I plan to support this plugin for the foreseeable future, as I get regular use out of it myself.<br>
+New modules may be added from time-to-time as I think of them and get them to a shareable state.<br>
 If you encounter any bugs or have any suggestions, feel free to open an issue, and I'll address it when I can.
-<br>
----
-### Disclaimer
-**This plugin modifies your in-game experience in a way that may be unfair in a multiplayer environment.**<br>
-**Do not use this plugin on servers without permission from the admins.**<br>
-**By using this plugin, you agree to take responsibility for any bans or disciplinary actions taken against you in response.**
----
+<br><br>
+> ### Disclaimer
+> This plugin modifies your in-game experience in a way that may be unfair in a multiplayer environment.<br>
+> Do not use this plugin on servers without permission from the admins.<br>
+> By using this plugin, you agree to take responsibility for any bans or disciplinary actions taken against you in response.
+<br><br>
 ### P.S.
 If you find my code unpalatable, consider going easy on me.<br>
 This project represents 90% of my entire experience with Java, Kotlin, and modding Minecraft.<br>
