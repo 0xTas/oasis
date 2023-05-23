@@ -109,7 +109,9 @@ internal object FarmAura: PluginModule(
             .filter {crop ->
                 (seeds.containsKey(world.getBlockState(crop).block)
                 || (world.getBlockState(crop.down()).block is BlockFarmland
-                && world.getBlockState(crop).block is BlockAir))
+                && world.getBlockState(crop).block is BlockAir)
+                    || (world.getBlockState(crop.down()).block is BlockSoulSand
+                    && world.getBlockState(crop).block is BlockAir))
             }
             .forEach {crop ->
                 val cropBlock = world.getBlockState(crop).block
@@ -123,6 +125,11 @@ internal object FarmAura: PluginModule(
                 {
                     if (farmTasks[crop] == null)
                         farmTasks[crop] = Items.WHEAT_SEEDS
+                    actionableBlocks.add(crop)
+                }else if (world.getBlockState(crop.down()).block is BlockSoulSand
+                    && world.getBlockState(crop).block is BlockAir) {
+                    if (farmTasks[crop] == null)
+                        farmTasks[crop] = Items.NETHER_WART
                     actionableBlocks.add(crop)
                 }
             }
@@ -154,15 +161,15 @@ internal object FarmAura: PluginModule(
     private fun canReplant(pos: BlockPos): Boolean {
         val player = mc.player
         val world: World = player?.world ?: return false
-        val item = farmTasks[pos]
+        val item = farmTasks[pos] ?: return false
 
         if (item == Items.WHEAT_SEEDS || item == Items.CARROT || item == Items.POTATO
             || item == Items.BEETROOT_SEEDS) {
-
             return (world.getBlockState(pos.down()).block is BlockFarmland
                 && world.getBlockState(pos).block is BlockAir)
         }
-        if (item == Items.NETHER_WART) return world.getBlockState(pos.down()).block is BlockSoulSand
+        if (item == Items.NETHER_WART) return (world.getBlockState(pos.down()).block is BlockSoulSand
+            && world.getBlockState(pos).block is BlockAir)
 
         return false
     }
@@ -230,39 +237,33 @@ internal object FarmAura: PluginModule(
                 if (interactBeetroot) cropsNeeded.add(Items.BEETROOT_SEEDS)
                 if (interactCarrots) cropsNeeded.add(Items.CARROT)
                 if (interactPotatoes) cropsNeeded.add(Items.POTATO)
-                if (interactNetherWart) cropsNeeded.add(Items.NETHER_WART)
             }
             Items.BEETROOT_SEEDS -> {
                 if (interactBeetroot) cropsNeeded.add(Items.BEETROOT_SEEDS)
                 if (interactWheat) cropsNeeded.add(Items.WHEAT_SEEDS)
                 if (interactCarrots) cropsNeeded.add(Items.CARROT)
                 if (interactPotatoes) cropsNeeded.add(Items.POTATO)
-                if (interactNetherWart) cropsNeeded.add(Items.NETHER_WART)
             }
             Items.CARROT -> {
                 if (interactCarrots) cropsNeeded.add(Items.CARROT)
                 if (interactPotatoes) cropsNeeded.add(Items.POTATO)
                 if (interactBeetroot) cropsNeeded.add(Items.BEETROOT_SEEDS)
                 if (interactWheat) cropsNeeded.add(Items.WHEAT_SEEDS)
-                if (interactNetherWart) cropsNeeded.add(Items.NETHER_WART)
             }
             Items.POTATO -> {
                 if (interactPotatoes) cropsNeeded.add(Items.POTATO)
                 if (interactCarrots) cropsNeeded.add(Items.CARROT)
                 if (interactBeetroot) cropsNeeded.add(Items.BEETROOT_SEEDS)
                 if (interactWheat) cropsNeeded.add(Items.WHEAT_SEEDS)
-                if (interactNetherWart) cropsNeeded.add(Items.NETHER_WART)
             }
             Items.NETHER_WART -> {
                 if (interactNetherWart) cropsNeeded.add(Items.NETHER_WART)
-                if (interactPotatoes) cropsNeeded.add(Items.POTATO)
-                if (interactCarrots) cropsNeeded.add(Items.CARROT)
-                if (interactBeetroot) cropsNeeded.add(Items.BEETROOT_SEEDS)
-                if (interactWheat) cropsNeeded.add(Items.WHEAT_SEEDS)
             }
-            boneMeal -> cropsNeeded.add(boneMeal)
+            boneMeal -> if (shouldBonemeal) cropsNeeded.add(boneMeal)
             else -> return false
         }
+
+        if (cropsNeeded.isEmpty()) return false
         for (neededItem in cropsNeeded) {
             if (!swapToNeededItem(neededItem)) continue
 
@@ -330,9 +331,9 @@ internal object FarmAura: PluginModule(
         val player = mc.player
 
         val blockCrop = player.world.getBlockState(block).block
-        if (interactMap()[blockCrop] != null) {
-            if (!interactMap()[blockCrop]!!) {
-                farmTasks.remove(block)
+        val interact = interactMap()[blockCrop]
+        if (interact != null) {
+            if (!interact) {
                 return true
             }
         }
