@@ -38,7 +38,7 @@ object EntityJesus : PluginModule(
     // Prevent fall distance from building up and thanos-snapping your poor horse upon returning to land
     val job = BackgroundJob("EntityJesus", 2500) {
         interval = true
-        delay(69)
+        delay(100)
         interval = false
     }
 
