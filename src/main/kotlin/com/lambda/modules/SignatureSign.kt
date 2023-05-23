@@ -22,6 +22,9 @@ import com.lambda.client.util.text.MessageSendHelper
 import net.minecraft.network.play.client.CPacketUpdateSign
 
 
+/**
+ * @author 0xTas <root@0xTas.dev>
+ */
 internal object SignatureSign : PluginModule(
     name = "Signature Sign",
     category = Category.MISC,
