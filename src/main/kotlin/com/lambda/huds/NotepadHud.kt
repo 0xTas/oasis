@@ -5,6 +5,10 @@ import com.lambda.client.event.SafeClientEvent
 import com.lambda.client.util.color.ColorHolder
 import com.lambda.client.plugin.api.PluginLabelHud
 
+
+/**
+ * @author 0xTas <root@0xTas.dev>
+ */
 internal object NotepadHud : PluginLabelHud(
     name = "Notepad",
     category = Category.MISC,

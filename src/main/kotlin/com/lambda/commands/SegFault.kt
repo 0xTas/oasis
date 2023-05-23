@@ -7,6 +7,9 @@ import com.lambda.client.command.ClientCommand
 import com.lambda.client.util.text.MessageSendHelper
 
 
+/**
+ * @author 0xTas <root@0xTas.dev>
+ */
 object SegFault : ClientCommand(
     name = "segfault",
     alias = arrayOf("crash", "hcf"),
