@@ -29,15 +29,15 @@ internal object SignatureSign : PluginModule(
     pluginMain = Oasis
 ) {
     private val mode by setting("Mode", value = Mode.TEMPLATE)
-    private val line1Mode by setting("Line 1 Mode", value = LineMode.CUSTOM)
-    private val line1Text by setting("Line 1 Text", "-=-")
-    private val line2Mode by setting("Line 2 Mode", value = LineMode.USERNAME_WAS_HERE)
-    private val line2Text by setting("Line 2 Text", "")
-    private val line3Mode by setting("Line 3 Mode", value = LineMode.TIMESTAMP)
-    private val line3Text by setting("Line 3 Text", "")
-    private val line4Mode by setting("Line 4 Mode", value = LineMode.CUSTOM)
-    private val line4Text by setting("Line 4 Text", "-=-")
-    private val timestampType by setting("Timestamp Format", value = TimestampType.MMDDYY)
+    private val line1Mode by setting("Line 1 Mode", value = LineMode.CUSTOM, { mode == Mode.TEMPLATE })
+    private val line1Text by setting("Line 1 Text", "-=-", { mode == Mode.TEMPLATE })
+    private val line2Mode by setting("Line 2 Mode", value = LineMode.USERNAME_WAS_HERE, { mode == Mode.TEMPLATE })
+    private val line2Text by setting("Line 2 Text", "", { mode == Mode.TEMPLATE })
+    private val line3Mode by setting("Line 3 Mode", value = LineMode.TIMESTAMP, { mode == Mode.TEMPLATE })
+    private val line3Text by setting("Line 3 Text", "", { mode == Mode.TEMPLATE })
+    private val line4Mode by setting("Line 4 Mode", value = LineMode.CUSTOM, { mode == Mode.TEMPLATE })
+    private val line4Text by setting("Line 4 Text", "-=-", { mode == Mode.TEMPLATE })
+    private val timestampType by setting("Timestamp Format", value = TimestampType.MMDDYY, { mode == Mode.TEMPLATE })
     private val packetDelay by setting(
         "Packet Delay (ms)",
         value = 2000,
