@@ -1,6 +1,7 @@
 package com.lambda.modules
 
 import com.lambda.Oasis
+import kotlinx.coroutines.launch
 import net.minecraft.block.BlockSign
 import net.minecraft.client.Minecraft
 import net.minecraft.util.math.BlockPos
@@ -8,12 +9,17 @@ import com.lambda.client.module.Category
 import com.lambda.client.event.LambdaEventBus
 import net.minecraft.tileentity.TileEntitySign
 import com.lambda.client.plugin.api.PluginModule
+import com.lambda.client.util.threads.defaultScope
 import com.lambda.client.util.threads.safeListener
-import com.lambda.client.util.threads.BackgroundJob
 import com.lambda.client.util.text.MessageSendHelper
 import com.lambda.client.event.events.ConnectionEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 
+/**
+ * @author 0xTas <root@0xTas.dev>
+ */
 internal object ChatSigns : PluginModule(
     name = "ChatSigns",
     description = "Read nearby signs in your chat",
@@ -22,22 +28,16 @@ internal object ChatSigns : PluginModule(
 ){
     private val mc = Minecraft.getMinecraft()
     private val posSet = hashSetOf<BlockPos>()
-
     private val showCoords by setting("Show Coordinates", value = true, description = "Include sign coordinates")
+    private val tickRate by setting(
+        "Tick Rate",
+        value = 2,
+        range = 2..10,
+        step = 2,
+        description = "Increase if needed"
+    )
 
-    val job = BackgroundJob("ChatSigns", 100) {
-        if (isEnabled && mc.player != null && mc.player.world != null) {
-            val surroundings = getSurroundingSigns(mc.player.position)
-
-            if (surroundings.isNotEmpty()) {
-                for (sign in surroundings) {
-                    if (signAlreadyLogged(sign))
-                        continue
-                    chatSign(sign)
-                }
-            }
-        }
-    }
+    private var ticksEnabled = 0
 
 
     private fun getSurroundingSigns(playerPos: BlockPos): HashSet<BlockPos> {
@@ -108,6 +108,27 @@ internal object ChatSigns : PluginModule(
         LambdaEventBus.subscribe(this)
         safeListener<ConnectionEvent.Disconnect> {
             posSet.clear()
+        }
+
+        safeListener<ClientTickEvent> {
+            if (it.phase != TickEvent.Phase.START) return@safeListener
+            ticksEnabled++
+
+            if (ticksEnabled % tickRate == 0) {
+                defaultScope.launch {
+                    if (isEnabled && mc.player != null && mc.player.world != null) {
+                        val surroundings = getSurroundingSigns(ChatSigns.mc.player.position)
+
+                        if (surroundings.isNotEmpty()) {
+                            for (sign in surroundings) {
+                                if (signAlreadyLogged(sign))
+                                    continue
+                                if (!isDisabled) chatSign(sign)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
