@@ -4,19 +4,21 @@ import java.util.*
 import com.lambda.modules.*
 import com.lambda.huds.NotepadHud
 import com.lambda.commands.SegFault
-import com.lambda.modules.SignatureSign
 import com.lambda.client.plugin.api.Plugin
 
 
+/**
+ * @author 0xTas <root@0xTas.dev>
+ */
 internal object Oasis : Plugin() {
     override fun onLoad() {
+        modules.add(FarmAura)
         commands.add(SegFault)
         modules.add(ChatSigns)
         modules.add(EntityJesus)
         modules.add(SignatureSign)
         hudElements.add(NotepadHud)
 
-        bgJobs.add(ChatSigns.job)
         bgJobs.add(EntityJesus.job)
     }
 
