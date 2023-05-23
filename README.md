@@ -17,7 +17,7 @@ It includes a collection of custom modules designed for use on the anarchy serve
 ---
 ### Installation
 1. Firstly, ensure that Minecraft 1.12.2, Forge, and [Lambda](https://github.com/lambda-client/lambda) are installed.
-2. [Download the plugin](https://github.com/0xTas/oasis/releases/tag/v1.1.2) or [build it from source](https://github.com/0xTas/oasis#contributing).
+2. [Download the plugin](https://github.com/0xTas/oasis/releases/latest/) or [build it from source](https://github.com/0xTas/oasis#contributing).
 3. Place the JAR file in your `.minecraft/lambda/plugins` folder.
 ---
 ### Contributing
