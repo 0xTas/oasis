@@ -76,7 +76,7 @@ internal object ChatSigns : PluginModule(
 
             var shouldRet = true
             for (text in textObjects) {
-                if (text.unformattedText.trim() != "")
+                if (text.unformattedText.trim().isNotEmpty())
                     shouldRet = false
             }
             if (shouldRet) return
