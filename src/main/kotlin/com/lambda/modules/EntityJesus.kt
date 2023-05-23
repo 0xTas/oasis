@@ -21,7 +21,10 @@ import net.minecraft.network.play.server.SPacketPlayerPosLook
 import com.lambda.client.event.events.AddCollisionBoxToListEvent
 
 
-// Credit to the writers/contributors of the Jesus module in Lambda 3.3 for the starting point
+// Credit to the writers and contributors of the Jesus module in Lambda 3.3 for the starting point.
+/**
+ * @author 0xTas <root@0xTas.dev>
+ */
 object EntityJesus : PluginModule(
     name = "EntityJesus",
     description = "Ride entities (mainly horses) over water",
