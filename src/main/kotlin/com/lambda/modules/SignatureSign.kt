@@ -51,6 +51,13 @@ internal object SignatureSign : PluginModule(
     private val autoDisable by setting("Auto Disable", value = false, description = "Disable after placing a sign")
     private val verbose by setting("Verbose", value = false, description = "Prints confirmation messages in the chat")
 
+    @Suppress("unused")
+    private val openLambdaFolder by setting("Open Lambda Folder...", false, {mode == Mode.READ_FROM_FILE},
+        consumer = { _, _ ->
+            FolderUtils.openFolder(FolderUtils.lambdaFolder)
+            false
+        }, description = "Opens the folder where sigSign.txt should go")
+
     private val mc = Minecraft.getMinecraft()
 
     private var modified = false
@@ -250,6 +257,7 @@ internal object SignatureSign : PluginModule(
     }
 
     init {
+        LambdaEventBus.subscribe(this)
         safeListener<PacketEvent.Send> { packet ->
             if (isDisabled || packet.packet !is CPacketUpdateSign) return@safeListener
 
@@ -273,12 +281,10 @@ internal object SignatureSign : PluginModule(
             if (mode == Mode.READ_FROM_FILE && verbose)
                 MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §fRead from file into outbound §2CPacketUpdateSign §fpacket.")
 
-            if (autoDisable)
+            if (autoDisable) {
+                modified = false
                 disable()
+            }
         }
-    }
-
-    init {
-        LambdaEventBus.subscribe(this)
     }
 }
