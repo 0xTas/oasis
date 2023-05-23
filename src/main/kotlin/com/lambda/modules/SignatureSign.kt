@@ -53,6 +53,8 @@ internal object SignatureSign : PluginModule(
 
     private val mc = Minecraft.getMinecraft()
 
+    private var modified = false
+
     private enum class Mode {
         TEMPLATE, READ_FROM_FILE
     }
@@ -253,12 +255,18 @@ internal object SignatureSign : PluginModule(
 
             val signText = getSignTextComponents()
 
-            defaultScope.launch {
-                delay(packetDelay.toLong())
-                player.connection.sendPacket(CPacketUpdateSign((packet.packet as CPacketUpdateSign).position, signText))
+            if (!modified) {
+                defaultScope.launch {
+                    delay(packetDelay.toLong())
+                    player.connection.sendPacket(CPacketUpdateSign((packet.packet as CPacketUpdateSign).position, signText))
+                }
+                packet.cancel()
+                modified = true
+            } else {
+                modified = false
+                return@safeListener
             }
 
-            packet.cancel()
             if (mode == Mode.TEMPLATE && verbose)
                 MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §fSending templated §2CPacketUpdateSign §fto the server.")
 
