@@ -101,6 +101,10 @@ internal object ChatSigns : PluginModule(
     }
 
     init {
+        onDisable {
+            posSet.clear()
+        }
+
         LambdaEventBus.subscribe(this)
         safeListener<ConnectionEvent.Disconnect> {
             posSet.clear()
