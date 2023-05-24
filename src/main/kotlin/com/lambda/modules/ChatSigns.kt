@@ -3,7 +3,6 @@ package com.lambda.modules
 import com.lambda.Oasis
 import kotlinx.coroutines.launch
 import net.minecraft.block.BlockSign
-import net.minecraft.client.Minecraft
 import net.minecraft.util.math.BlockPos
 import com.lambda.client.module.Category
 import com.lambda.client.event.LambdaEventBus
@@ -26,7 +25,6 @@ internal object ChatSigns : PluginModule(
     category = Category.CHAT,
     pluginMain = Oasis
 ){
-    private val mc = Minecraft.getMinecraft()
     private val posSet = hashSetOf<BlockPos>()
     private val showCoords by setting("Show Coordinates", value = true, description = "Include sign coordinates")
     private val tickRate by setting(
@@ -41,21 +39,23 @@ internal object ChatSigns : PluginModule(
 
 
     private fun getSurroundingSigns(playerPos: BlockPos): HashSet<BlockPos> {
+        val signList = HashSet<BlockPos>()
+        val world = mc.player?.world ?: return signList
+
         // Get every sign in a 7x7 chunk square centered on the player.
         val startX = playerPos.x - 112
         val startY = 0
         val startZ = playerPos.z - 112
         val endX = playerPos.x + 112
-        val endY = mc.player.world.height
+        val endY = world.height
         val endZ = playerPos.z + 112
 
-        val signList = HashSet<BlockPos>()
         for (x in startX..endX) {
             for (y in startY..endY) {
                 for (z in startZ..endZ) {
                     val pos = BlockPos(x, y, z)
 
-                    if (mc.player.world.getBlockState(pos).block is BlockSign) {
+                    if (world.getBlockState(pos).block is BlockSign) {
                         signList.add(pos)
                     }
                 }
@@ -66,7 +66,8 @@ internal object ChatSigns : PluginModule(
     }
 
     private fun chatSign(sign: BlockPos) {
-        val signEntity = mc.world.getTileEntity(sign)
+        val world = mc.player?.world ?: return
+        val signEntity = world.getTileEntity(sign)
 
         if (signEntity is TileEntitySign) {
             val textObjects = signEntity.signText
@@ -115,9 +116,10 @@ internal object ChatSigns : PluginModule(
             ticksEnabled++
 
             if (ticksEnabled % tickRate == 0) {
+                val player = mc.player ?: return@safeListener
                 defaultScope.launch {
-                    if (isEnabled && mc.player != null && mc.player.world != null) {
-                        val surroundings = getSurroundingSigns(ChatSigns.mc.player.position)
+                    if (isEnabled) {
+                        val surroundings = getSurroundingSigns(player.position)
 
                         if (surroundings.isNotEmpty()) {
                             for (sign in surroundings) {
