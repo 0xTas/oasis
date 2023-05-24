@@ -80,7 +80,7 @@ internal object SignatureSign : PluginModule(
     private fun getSignText(): List<String> {
         val signText = mutableListOf<String>()
         val player = mc.player
-        val username = player.name
+        val username = player?.name ?: return signText
 
         when (mode) {
             Mode.READ_FROM_FILE -> {

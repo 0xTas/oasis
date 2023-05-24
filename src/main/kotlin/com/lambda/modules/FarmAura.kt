@@ -102,8 +102,7 @@ internal object FarmAura: PluginModule(
 
     private fun registerFarmTasks(blocks: HashSet<BlockPos>): HashSet<BlockPos> {
         val actionableBlocks = HashSet<BlockPos>()
-        val player = mc.player
-        val world: World = player?.world ?: return actionableBlocks
+        val world = mc.player?.world ?: return actionableBlocks
 
         blocks.parallelStream()
             .filter {crop ->
@@ -137,8 +136,7 @@ internal object FarmAura: PluginModule(
     }
 
     private fun canHarvest(blockState: IBlockState, pos: BlockPos): Boolean {
-        val player = mc.player
-        val world = player?.world ?: return false
+        val world = mc.player?.world ?: return false
 
         return when (val block = blockState.block) {
             is BlockCrops -> block.isMaxAge(blockState)
@@ -159,8 +157,7 @@ internal object FarmAura: PluginModule(
     }
 
     private fun canReplant(pos: BlockPos): Boolean {
-        val player = mc.player
-        val world: World = player?.world ?: return false
+        val world: World = mc.player?.world ?: return false
         val item = farmTasks[pos] ?: return false
 
         if (item == Items.WHEAT_SEEDS || item == Items.CARROT || item == Items.POTATO
@@ -175,8 +172,7 @@ internal object FarmAura: PluginModule(
     }
 
     private fun SafeClientEvent.tryReplant(needed: Item, pos: BlockPos): Boolean {
-        val player = mc.player
-        val world: World = player?.world ?: return false
+        val world: World = mc.player?.world ?: return false
         val currentItem = player.getHeldItem(EnumHand.MAIN_HAND)
         val boneMeal = ItemStack(Item.getItemById(351), 1, 15).item
 
@@ -327,8 +323,7 @@ internal object FarmAura: PluginModule(
     }
 
     private fun harvestCrop(block: BlockPos): Boolean {
-        if (mc.player == null || mc.player.world == null) return false
-        val player = mc.player
+        val player = mc.player ?: return false
 
         val blockCrop = player.world.getBlockState(block).block
         val interact = interactMap()[blockCrop]
@@ -399,6 +394,7 @@ internal object FarmAura: PluginModule(
 
     private fun getSurroundingBlocks(playerPos: BlockPos, range: Int): HashSet<BlockPos> {
         val positions = HashSet<BlockPos>()
+        if (mc.player == null || mc.player.world == null) return positions
         for (x in playerPos.x - range..playerPos.x + range) {
             for (y in playerPos.y - range..playerPos.y + range) {
                 for (z in playerPos.z - range..playerPos.z + range) {
@@ -421,10 +417,10 @@ internal object FarmAura: PluginModule(
             ticksEnabled++
 
             if (ticksEnabled % tickRate == 0) {
-                val player = FarmAura.mc.player
-                val world: World? = player?.world
+                val player = mc.player
+                val world = player?.world ?: return@safeListener
 
-                if ((world != null && isEnabled)) {
+                if (isEnabled) {
                     defaultScope.launch {
                         val blocks = getSurroundingBlocks(player.position, reachRange)
                         val actionableBlocks = registerFarmTasks(blocks)

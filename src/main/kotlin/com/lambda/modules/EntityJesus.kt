@@ -131,7 +131,8 @@ object EntityJesus : PluginModule(
     }
 
     private fun isOnLand(entity: Entity): Boolean {
-        return (!mc.world.getBlockState(BlockPos(entity.positionVector.add(.0, -.1 + entity.motionY, .0))).material.isLiquid && !entity.isInWater)
+        val world = mc.world ?: return true
+        return (!world.getBlockState(BlockPos(entity.positionVector.add(.0, -.1 + entity.motionY, .0))).material.isLiquid && !entity.isInWater)
     }
 
 }
