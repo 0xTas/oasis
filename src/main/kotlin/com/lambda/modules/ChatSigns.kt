@@ -42,7 +42,6 @@ internal object ChatSigns : PluginModule(
         val signList = HashSet<BlockPos>()
         val world = mc.player?.world ?: return signList
 
-        // Get every sign in a 7x7 chunk square centered on the player.
         val startX = playerPos.x - 112
         val startY = 0
         val startZ = playerPos.z - 112
@@ -104,29 +103,32 @@ internal object ChatSigns : PluginModule(
     init {
         onDisable {
             posSet.clear()
+            ticksEnabled = 0
         }
 
         LambdaEventBus.subscribe(this)
         safeListener<ConnectionEvent.Disconnect> {
             posSet.clear()
+            ticksEnabled = 0
         }
 
         safeListener<ClientTickEvent> {
             if (it.phase != TickEvent.Phase.START) return@safeListener
             ticksEnabled++
 
+            if (ticksEnabled >= 65535) ticksEnabled = 0
             if (ticksEnabled % tickRate == 0) {
                 val player = mc.player ?: return@safeListener
                 defaultScope.launch {
-                    if (isEnabled) {
-                        val surroundings = getSurroundingSigns(player.position)
+                    if (isDisabled) return@launch
 
-                        if (surroundings.isNotEmpty()) {
-                            for (sign in surroundings) {
-                                if (signAlreadyLogged(sign))
-                                    continue
-                                if (!isDisabled) chatSign(sign)
-                            }
+                    val surroundings = getSurroundingSigns(player.position)
+
+                    if (surroundings.isNotEmpty()) {
+                        for (sign in surroundings) {
+                            if (signAlreadyLogged(sign))
+                                continue
+                            chatSign(sign)
                         }
                     }
                 }
