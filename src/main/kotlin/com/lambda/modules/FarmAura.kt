@@ -427,16 +427,7 @@ internal object FarmAura: PluginModule(
                         if (shouldHarvest) {
                             for (block in actionableBlocks) {
                                 if (canHarvest(world.getBlockState(block), block)) {
-                                    if (harvestCrop(block)) break
-                                }
-                            }
-                        }
-
-                        if (shouldBonemeal) {
-                            for (block in actionableBlocks) {
-                                if (canBonemeal(block)) {
-                                    val boneMeal = ItemStack(Item.getItemById(351), 1, 15).item
-                                    if (tryReplant(boneMeal, block)) break
+                                    if (harvestCrop(block)) return@launch
                                 }
                             }
                         }
@@ -445,8 +436,17 @@ internal object FarmAura: PluginModule(
                             for (block in actionableBlocks) {
                                 if (canReplant(block) && farmTasks[block] != null) {
                                     if (tryReplant(farmTasks[block]!!, block.down())) {
-                                        break
+                                        return@launch
                                     }
+                                }
+                            }
+                        }
+
+                        if (shouldBonemeal) {
+                            for (block in actionableBlocks) {
+                                if (canBonemeal(block)) {
+                                    val boneMeal = ItemStack(Item.getItemById(351), 1, 15).item
+                                    if (tryReplant(boneMeal, block)) return@launch
                                 }
                             }
                         }
