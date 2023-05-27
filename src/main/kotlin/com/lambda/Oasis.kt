@@ -15,6 +15,7 @@ internal object Oasis : Plugin() {
         modules.add(FarmAura)
         commands.add(SegFault)
         modules.add(ChatSigns)
+        modules.add(BannerInfo)
         modules.add(EntityJesus)
         modules.add(SignatureSign)
         hudElements.add(NotepadHud)
