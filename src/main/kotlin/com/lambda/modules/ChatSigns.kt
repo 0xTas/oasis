@@ -5,7 +5,7 @@ import kotlinx.coroutines.launch
 import net.minecraft.block.BlockSign
 import net.minecraft.util.math.BlockPos
 import com.lambda.client.module.Category
-import com.lambda.client.event.LambdaEventBus
+import com.lambda.client.event.SafeClientEvent
 import net.minecraft.tileentity.TileEntitySign
 import com.lambda.client.plugin.api.PluginModule
 import com.lambda.client.util.threads.defaultScope
@@ -27,6 +27,8 @@ internal object ChatSigns : PluginModule(
 ){
     private val posSet = hashSetOf<BlockPos>()
     private val showCoords by setting("Show Coordinates", value = true, description = "Include sign coordinates")
+    private val oldSigns by setting("Show Old Status", value = true , description = "Annotate signs placed prior to Minecraft version 1.8")
+    private val displayMode by setting("Display Mode", value = DisplayMode.FANCY, description = "Toggle between fancy/compact chat")
     private val tickRate by setting(
         "Tick Rate",
         value = 2,
@@ -37,8 +39,12 @@ internal object ChatSigns : PluginModule(
 
     private var ticksEnabled = 0
 
+    private enum class DisplayMode {
+        FANCY, COMPACT
+    }
 
-    private fun getSurroundingSigns(playerPos: BlockPos): HashSet<BlockPos> {
+
+    private fun SafeClientEvent.getSurroundingSigns(playerPos: BlockPos): HashSet<BlockPos> {
         val signList = HashSet<BlockPos>()
         val world = mc.player?.world ?: return signList
 
@@ -64,11 +70,15 @@ internal object ChatSigns : PluginModule(
         return signList
     }
 
-    private fun chatSign(sign: BlockPos) {
+    private fun SafeClientEvent.chatSign(sign: BlockPos) {
         val world = mc.player?.world ?: return
         val signEntity = world.getTileEntity(sign)
 
         if (signEntity is TileEntitySign) {
+            posSet.add(sign)
+            val packet = signEntity.updatePacket
+            val nbt = packet?.nbtCompound
+
             val textObjects = signEntity.signText
             val signX = sign.x
             val signY = sign.y
@@ -83,21 +93,37 @@ internal object ChatSigns : PluginModule(
 
             var textOnSignForChat = ""
             for (text in textObjects) {
-                textOnSignForChat += text.formattedText.replace("§r", " ")
+                textOnSignForChat += text.formattedText.replace("§r", "\n")
             }
-            val chatData = if (showCoords) {
-                "§8[§f${signX}, ${signY}, ${signZ}§8]§f: §o\"${textOnSignForChat}\""
+            val old = (oldSigns && nbt != null && isOld("$nbt"))
+            val notOld = (oldSigns && nbt != null && !isOld("$nbt"))
+            var chatData = if (old) {
+                " §8[§cOLD§8]§f:\n§2§o\"${textOnSignForChat.trimEnd().replace("\n", "\n§2")}\""
+            } else if (notOld && showCoords){
+                "\n§o\"${textOnSignForChat.trimEnd()}\""
+            }else if (notOld && !showCoords) {
+                "§o\"${textOnSignForChat.trimEnd()}\""
+            }else if (showCoords){
+                "\n§o\"${textOnSignForChat.trimEnd()}\""
             } else {
-                "§o\"${textOnSignForChat}\""
+                " §o\"${textOnSignForChat.trimEnd()}\""
             }
 
-            posSet.add(sign)
-            MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §f$chatData")
+            if (displayMode == DisplayMode.COMPACT) chatData = chatData.replace("\n", " ")
+            if (showCoords) {
+                MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] [§f${signX}, ${signY}, ${signZ}§8]§f:$chatData")
+            } else {
+                MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §f$chatData")
+            }
         }
     }
 
     private fun signAlreadyLogged(signPos: BlockPos): Boolean {
         return posSet.contains(signPos)
+    }
+
+    private fun isOld(metadata: String): Boolean {
+        return !metadata.contains("""{\"extra\":[{\"text\":""")
     }
 
     init {
@@ -106,7 +132,6 @@ internal object ChatSigns : PluginModule(
             ticksEnabled = 0
         }
 
-        LambdaEventBus.subscribe(this)
         safeListener<ConnectionEvent.Disconnect> {
             posSet.clear()
             ticksEnabled = 0
@@ -120,15 +145,13 @@ internal object ChatSigns : PluginModule(
             if (ticksEnabled % tickRate == 0) {
                 val player = mc.player ?: return@safeListener
                 defaultScope.launch {
-                    if (isDisabled) return@launch
-
                     val surroundings = getSurroundingSigns(player.position)
 
                     if (surroundings.isNotEmpty()) {
                         for (sign in surroundings) {
                             if (signAlreadyLogged(sign))
                                 continue
-                            chatSign(sign)
+                            if (!isDisabled) chatSign(sign)
                         }
                     }
                 }
