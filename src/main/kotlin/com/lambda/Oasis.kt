@@ -13,6 +13,7 @@ import com.lambda.client.plugin.api.Plugin
 internal object Oasis : Plugin() {
     override fun onLoad() {
         modules.add(FarmAura)
+        modules.add(OldSigns)
         commands.add(SegFault)
         modules.add(ChatSigns)
         modules.add(BannerInfo)
