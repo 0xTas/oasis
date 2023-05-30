@@ -12,7 +12,6 @@ import com.lambda.client.module.Category
 import java.time.format.DateTimeFormatter
 import com.lambda.client.util.FolderUtils
 import net.minecraft.util.text.ITextComponent
-import com.lambda.client.event.LambdaEventBus
 import com.lambda.client.plugin.api.PluginModule
 import com.lambda.client.event.events.PacketEvent
 import com.lambda.client.util.threads.safeListener
@@ -257,7 +256,6 @@ internal object SignatureSign : PluginModule(
     }
 
     init {
-        LambdaEventBus.subscribe(this)
         safeListener<PacketEvent.Send> { packet ->
             if (isDisabled || packet.packet !is CPacketUpdateSign) return@safeListener
 
