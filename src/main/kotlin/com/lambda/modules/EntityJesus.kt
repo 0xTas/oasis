@@ -23,7 +23,7 @@ import com.lambda.client.event.events.AddCollisionBoxToListEvent
 
 // Credit to the writers and contributors of the Jesus module in Lambda 3.3 for the starting point.
 /**
- * @author 0xTas <root@0xTas.dev>
+ * @author 0xTas [Tas#1337] <root@0xTas.dev>
  */
 object EntityJesus : PluginModule(
     name = "EntityJesus",

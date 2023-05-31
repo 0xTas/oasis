@@ -8,7 +8,7 @@ import com.lambda.client.util.text.MessageSendHelper
 
 
 /**
- * @author 0xTas <root@0xTas.dev>
+ * @author 0xTas [Tas#1337] <root@0xTas.dev>
  */
 object SegFault : ClientCommand(
     name = "segfault",

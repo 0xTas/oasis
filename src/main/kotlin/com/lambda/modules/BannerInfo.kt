@@ -3,7 +3,6 @@ package com.lambda.modules
 import com.lambda.Oasis
 import net.minecraft.block.BlockBanner
 import com.lambda.client.module.Category
-import com.lambda.client.event.LambdaEventBus
 import net.minecraft.tileentity.TileEntityBanner
 import com.lambda.client.plugin.api.PluginModule
 import com.lambda.client.util.threads.safeListener
@@ -12,7 +11,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent
 
 
 /**
- * @author 0xTas <root@0xTas.dev>
+ * @author 0xTas [Tas#1337] <root@0xTas.dev>
  */
 internal object BannerInfo : PluginModule(
     name = "BannerInfo",
@@ -24,10 +23,10 @@ internal object BannerInfo : PluginModule(
     private var whyFireTwice = false
 
     init {
-        LambdaEventBus.subscribe(this)
         safeListener<PlayerInteractEvent.RightClickBlock> {
             val world = it.world ?: return@safeListener
             val pos = it.pos
+
 
             if (!whyFireTwice && world.getBlockState(pos).block is BlockBanner) {
                 whyFireTwice = true
