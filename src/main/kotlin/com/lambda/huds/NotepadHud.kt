@@ -7,7 +7,7 @@ import com.lambda.client.plugin.api.PluginLabelHud
 
 
 /**
- * @author 0xTas <root@0xTas.dev>
+ * @author 0xTas [Tas#1337] <root@0xTas.dev>
  */
 internal object NotepadHud : PluginLabelHud(
     name = "Notepad",
@@ -38,6 +38,7 @@ internal object NotepadHud : PluginLabelHud(
     private val notepadText9 by setting("Note 10", "")
     private val textColor9 by setting("Color 10", ColorHolder(255, 255, 255, 255))
 
+
     override fun SafeClientEvent.updateText() {
         if (newLines && !bulletPoints) {
             displayText.addLine(notepadText, textColor)
@@ -51,27 +52,27 @@ internal object NotepadHud : PluginLabelHud(
             displayText.addLine(notepadText8, textColor8)
             displayText.addLine(notepadText9, textColor9)
         } else if (newLines && bulletPoints) {
-            displayText.addLine("• $notepadText", textColor)
-            displayText.addLine("• $notepadText1", textColor1)
-            displayText.addLine("• $notepadText2", textColor2)
-            displayText.addLine("• $notepadText3", textColor3)
-            displayText.addLine("• $notepadText4", textColor4)
-            displayText.addLine("• $notepadText5", textColor5)
-            displayText.addLine("• $notepadText6", textColor6)
-            displayText.addLine("• $notepadText7", textColor7)
-            displayText.addLine("• $notepadText8", textColor8)
-            displayText.addLine("• $notepadText9", textColor9)
+            displayText.addLine(if (notepadText.isNotEmpty()) "• $notepadText" else "", textColor)
+            displayText.addLine(if (notepadText1.isNotEmpty()) "• $notepadText1" else "", textColor1)
+            displayText.addLine(if (notepadText2.isNotEmpty()) "• $notepadText2" else "", textColor2)
+            displayText.addLine(if (notepadText3.isNotEmpty()) "• $notepadText3" else "", textColor3)
+            displayText.addLine(if (notepadText4.isNotEmpty()) "• $notepadText4" else "", textColor4)
+            displayText.addLine(if (notepadText5.isNotEmpty()) "• $notepadText5" else "", textColor5)
+            displayText.addLine(if (notepadText6.isNotEmpty()) "• $notepadText6" else "", textColor6)
+            displayText.addLine(if (notepadText7.isNotEmpty()) "• $notepadText7" else "", textColor7)
+            displayText.addLine(if (notepadText8.isNotEmpty()) "• $notepadText8" else "", textColor8)
+            displayText.addLine(if (notepadText9.isNotEmpty()) "• $notepadText9" else "", textColor9)
         }else if (!newLines && bulletPoints) {
-            displayText.add("• $notepadText", textColor)
-            displayText.add(notepadText1, textColor1)
-            displayText.add(notepadText2, textColor2)
-            displayText.add(notepadText3, textColor3)
-            displayText.add(notepadText4, textColor4)
-            displayText.add(notepadText5, textColor5)
-            displayText.add(notepadText6, textColor6)
-            displayText.add(notepadText7, textColor7)
-            displayText.add(notepadText8, textColor8)
-            displayText.add(notepadText9, textColor9)
+            displayText.add(if (notepadText.isNotEmpty()) "• $notepadText" else "", textColor)
+            displayText.add(if (notepadText1.isNotEmpty()) "• $notepadText1" else "", textColor1)
+            displayText.add(if (notepadText2.isNotEmpty()) "• $notepadText2" else "", textColor2)
+            displayText.add(if (notepadText3.isNotEmpty()) "• $notepadText3" else "", textColor3)
+            displayText.add(if (notepadText4.isNotEmpty()) "• $notepadText4" else "", textColor4)
+            displayText.add(if (notepadText5.isNotEmpty()) "• $notepadText5" else "", textColor5)
+            displayText.add(if (notepadText6.isNotEmpty()) "• $notepadText6" else "", textColor6)
+            displayText.add(if (notepadText7.isNotEmpty()) "• $notepadText7" else "", textColor7)
+            displayText.add(if (notepadText8.isNotEmpty()) "• $notepadText8" else "", textColor8)
+            displayText.add(if (notepadText9.isNotEmpty()) "• $notepadText9" else "", textColor9)
         } else if (!newLines && !bulletPoints) {
             displayText.add(notepadText, textColor)
             displayText.add(notepadText1, textColor1)
