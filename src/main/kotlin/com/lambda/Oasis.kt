@@ -19,6 +19,7 @@ internal object Oasis : Plugin() {
         modules.add(BannerInfo)
         modules.add(EntityJesus)
         modules.add(SignatureSign)
+        modules.add(UpdateNotifier)
         hudElements.add(NotepadHud)
 
         bgJobs.add(EntityJesus.job)
