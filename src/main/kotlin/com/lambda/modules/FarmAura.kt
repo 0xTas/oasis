@@ -18,9 +18,9 @@ import net.minecraft.item.ItemSword
 import net.minecraft.util.math.Vec3i
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.EnumFacing
-import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemPickaxe
 import net.minecraft.item.ItemAppleGold
+import com.lambda.client.util.TickTimer
 import net.minecraft.util.math.BlockPos
 import com.lambda.client.module.Category
 import net.minecraft.util.math.MathHelper
@@ -34,12 +34,12 @@ import com.lambda.client.util.threads.safeListener
 import net.minecraft.client.multiplayer.WorldClient
 import com.lambda.client.util.MovementUtils.isMoving
 import com.lambda.client.util.items.swapToItemOrMove
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import com.lambda.client.event.events.ConnectionEvent
+import com.lambda.client.event.events.RenderWorldEvent
 
 
 /**
- * @author 0xTas <root@0xTas.dev>
+ * @author 0xTas [Tas#1337] <root@0xTas.dev>
  */
 internal object FarmAura: PluginModule(
     name = "FarmAura",
@@ -60,18 +60,10 @@ internal object FarmAura: PluginModule(
     private val reachRange by setting(
         "Range",
         value = 3,
-        range = 1..6,
+        range = 1..5,
         step = 1,
         description = "Reach range. Lower values may help in strict environments."
     )
-    private val tickRate by setting(
-        "Tick Rate",
-        value = 2,
-        range = 2..10,
-        step = 2,
-        description = "Increase if needed"
-    )
-    private val mc = Minecraft.getMinecraft()
     private val seeds = hashMapOf(
         Blocks.REEDS to Items.REEDS,
         Blocks.CARROTS to Items.CARROT,
@@ -85,7 +77,7 @@ internal object FarmAura: PluginModule(
         MODES, CROPS
     }
 
-    private var ticksEnabled = 0
+    private val timer = TickTimer()
     private var farmTasks: HashMap<BlockPos, Item> = HashMap()
 
 
@@ -100,8 +92,8 @@ internal object FarmAura: PluginModule(
         )
     }
 
-    private fun registerFarmTasks(blocks: HashSet<BlockPos>): HashSet<BlockPos> {
-        val actionableBlocks = HashSet<BlockPos>()
+    private fun SafeClientEvent.registerFarmTasks(blocks: ArrayList<BlockPos>): ArrayList<BlockPos> {
+        val actionableBlocks = ArrayList<BlockPos>()
         val world = mc.player?.world ?: return actionableBlocks
 
         blocks.parallelStream()
@@ -135,7 +127,7 @@ internal object FarmAura: PluginModule(
         return actionableBlocks
     }
 
-    private fun canHarvest(blockState: IBlockState, pos: BlockPos): Boolean {
+    private fun SafeClientEvent.canHarvest(blockState: IBlockState, pos: BlockPos): Boolean {
         val world = mc.player?.world ?: return false
 
         return when (val block = blockState.block) {
@@ -147,7 +139,7 @@ internal object FarmAura: PluginModule(
         }
     }
 
-    private fun canBonemeal(pos: BlockPos): Boolean {
+    private fun SafeClientEvent.canBonemeal(pos: BlockPos): Boolean {
         val world = mc.player?.world ?: return false
         val state = world.getBlockState(pos)
         return when (val block = state.block) {
@@ -156,7 +148,7 @@ internal object FarmAura: PluginModule(
         }
     }
 
-    private fun canReplant(pos: BlockPos): Boolean {
+    private fun SafeClientEvent.canReplant(pos: BlockPos): Boolean {
         val world: World = mc.player?.world ?: return false
         val item = farmTasks[pos] ?: return false
 
@@ -322,7 +314,7 @@ internal object FarmAura: PluginModule(
         return true
     }
 
-    private fun harvestCrop(block: BlockPos): Boolean {
+    private fun SafeClientEvent.harvestCrop(block: BlockPos): Boolean {
         val player = mc.player ?: return false
 
         val blockCrop = player.world.getBlockState(block).block
@@ -377,6 +369,19 @@ internal object FarmAura: PluginModule(
         return true
     }
 
+    private fun SafeClientEvent.getSurroundingBlocks(playerPos: BlockPos, range: Int): ArrayList<BlockPos> {
+        val positions = ArrayList<BlockPos>()
+        if (mc.player == null || mc.player.world == null) return positions
+        for (x in playerPos.x - range..playerPos.x + range) {
+            for (y in playerPos.y - range..playerPos.y + range) {
+                for (z in playerPos.z - range..playerPos.z + range) {
+                    positions.add(BlockPos(x, y, z))
+                }
+            }
+        }
+        return positions
+    }
+
     private fun lookAtBlock(hitVec: Vec3d): FloatArray {
         val player = mc.player ?: return floatArrayOf()
         val eyesPos = player.getPositionEyes(1F)
@@ -392,36 +397,20 @@ internal object FarmAura: PluginModule(
         return floatArrayOf(MathHelper.wrapDegrees(yaw).toFloat(), MathHelper.wrapDegrees(pitch).toFloat())
     }
 
-    private fun getSurroundingBlocks(playerPos: BlockPos, range: Int): HashSet<BlockPos> {
-        val positions = HashSet<BlockPos>()
-        if (mc.player == null || mc.player.world == null) return positions
-        for (x in playerPos.x - range..playerPos.x + range) {
-            for (y in playerPos.y - range..playerPos.y + range) {
-                for (z in playerPos.z - range..playerPos.z + range) {
-                    positions.add(BlockPos(x, y, z))
-                }
-            }
-        }
-        return positions
-    }
-
 
     init {
         onDisable {
             farmTasks.clear()
-            ticksEnabled = 0
         }
 
-        safeListener<ClientTickEvent> {
-            if (it.phase != TickEvent.Phase.START) return@safeListener
-            ticksEnabled++
+        safeListener<ConnectionEvent.Disconnect> {
+            farmTasks.clear()
+        }
 
-            if (ticksEnabled % tickRate == 0) {
-                val player = mc.player
-                val world = player?.world ?: return@safeListener
-
-                if (isEnabled) {
-                    defaultScope.launch {
+        safeListener<RenderWorldEvent> {
+            if (timer.tick(169) && isEnabled) {
+                defaultScope.launch {
+                    try {
                         val blocks = getSurroundingBlocks(player.position, reachRange)
                         val actionableBlocks = registerFarmTasks(blocks)
                         if (shouldHarvest) {
@@ -450,7 +439,7 @@ internal object FarmAura: PluginModule(
                                 }
                             }
                         }
-                    }
+                    }catch (e: NullPointerException) {return@launch}
                 }
             }
         }
