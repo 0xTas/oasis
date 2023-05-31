@@ -21,7 +21,7 @@ import com.lambda.client.event.events.RenderWorldEvent
 
 
 /**
- * @author 0xTas <root@0xTas.dev>
+ * @author 0xTas [Tas#1337] <root@0xTas.dev>
  */
 internal object OldSigns : PluginModule(
     name = "OldSigns",
@@ -79,20 +79,19 @@ internal object OldSigns : PluginModule(
             val startZ = playerPos.z - chunks
             val endZ = playerPos.z + chunks
 
+            val blockPos = BlockPos.MutableBlockPos(0,0,0)
             for (x in startX..endX) {
                 for (y in startY..endY) {
                     for (z in startZ..endZ) {
-                        val blockPos = BlockPos(x,y,z)
+                        blockPos.setPos(x,y,z)
                         val state = world.getBlockState(blockPos)
                         val block = state.block
 
                         if (block !is BlockSign) continue
 
                         val facing: EnumFacing? = try {
-                            Companion.mc.player.world.getBlockState(blockPos).getValue(BlockHorizontal.FACING)
-                        }catch (err: IllegalArgumentException) {
-                            null
-                        }
+                            world.getBlockState(blockPos).getValue(BlockHorizontal.FACING)
+                        }catch (err: IllegalArgumentException) {null}
 
                         val quad = when (mode) {
                             RenderMode.BASE -> {
@@ -135,17 +134,9 @@ internal object OldSigns : PluginModule(
         val signDepth = 0.07
 
         var standing = false
-
         var posX = pos.x.toDouble()
         var posY = pos.y.toDouble()
         var posZ = pos.z.toDouble()
-
-        val minX: Double
-        val minY: Double
-        val minZ: Double
-        val maxX: Double
-        val maxY: Double
-        val maxZ: Double
 
         when (mode) {
             RenderMode.SIGN -> {
@@ -176,6 +167,13 @@ internal object OldSigns : PluginModule(
             RenderMode.BLOCK, RenderMode.BASE -> return AxisAlignedBB(pos)
         }
 
+        val minX: Double
+        val minY: Double
+        val minZ: Double
+        val maxX: Double
+        val maxY: Double
+        val maxZ: Double
+
         if (standing) {
             when (rot) {
                 0, 8 -> { // North & South
@@ -199,23 +197,26 @@ internal object OldSigns : PluginModule(
                 }
             }
         } else {
-            if (facing == EnumFacing.NORTH || facing == EnumFacing.SOUTH) {
-                minX = posX + 0.5 - signWidth
-                minY = posY + 0.5 - signHeight
-                minZ = posZ + 0.5 - signDepth
-                maxX = posX + 0.5 + signWidth
-                maxY = posY + 0.5 + signHeight
-                maxZ = posZ + 0.5 + signDepth
-            } else {
-                minX = posX + 0.5 - signDepth
-                minY = posY + 0.5 - signHeight
-                minZ = posZ + 0.5 - signWidth
-                maxX = posX + 0.5 + signDepth
-                maxY = posY + 0.5 + signHeight
-                maxZ = posZ + 0.5 + signWidth
+            when (facing) {
+                EnumFacing.NORTH, EnumFacing.SOUTH -> {
+                    minX = posX + 0.5 - signWidth
+                    minY = posY + 0.5 - signHeight
+                    minZ = posZ + 0.5 - signDepth
+                    maxX = posX + 0.5 + signWidth
+                    maxY = posY + 0.5 + signHeight
+                    maxZ = posZ + 0.5 + signDepth
+                }
+                else -> {
+                    minX = posX + 0.5 - signDepth
+                    minY = posY + 0.5 - signHeight
+                    minZ = posZ + 0.5 - signWidth
+                    maxX = posX + 0.5 + signDepth
+                    maxY = posY + 0.5 + signHeight
+                    maxZ = posZ + 0.5 + signWidth
+                }
+
             }
         }
-
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
     }
 
@@ -225,7 +226,7 @@ internal object OldSigns : PluginModule(
             if (renderer == null) {
                 renderer = getRenderer()
             } else {
-                if (timer.tick(133L)) { // Avoid running this on a tick
+                if (timer.tick(133L)) {
                     updateRenderer()
                 }
                 renderer?.render(false)
