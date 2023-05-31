@@ -6,12 +6,12 @@ import java.time.LocalDate
 import com.lambda.Oasis.rCC
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
 import com.google.common.io.BaseEncoding
 import com.lambda.client.module.Category
 import java.time.format.DateTimeFormatter
 import com.lambda.client.util.FolderUtils
 import net.minecraft.util.text.ITextComponent
+import com.lambda.client.event.SafeClientEvent
 import com.lambda.client.plugin.api.PluginModule
 import com.lambda.client.event.events.PacketEvent
 import com.lambda.client.util.threads.safeListener
@@ -22,7 +22,7 @@ import net.minecraft.network.play.client.CPacketUpdateSign
 
 
 /**
- * @author 0xTas <root@0xTas.dev>
+ * @author 0xTas [Tas#1337] <root@0xTas.dev>
  */
 internal object SignatureSign : PluginModule(
     name = "Signature Sign",
@@ -57,8 +57,6 @@ internal object SignatureSign : PluginModule(
             false
         }, description = "Opens the folder where sigSign.txt should go")
 
-    private val mc = Minecraft.getMinecraft()
-
     private var modified = false
 
     private enum class Mode {
@@ -76,7 +74,8 @@ internal object SignatureSign : PluginModule(
         MONTH_YEAR, YEAR, DAY_MONTH, MONTH_DAY, UNIX_EPOCH
     }
 
-    private fun getSignText(): List<String> {
+
+    private fun SafeClientEvent.getSignText(): List<String> {
         val signText = mutableListOf<String>()
         val player = mc.player
         val username = player?.name ?: return signText
@@ -164,7 +163,7 @@ internal object SignatureSign : PluginModule(
         return signText
     }
 
-    private fun getSignTextComponents(): Array<out ITextComponent> {
+    private fun SafeClientEvent.getSignTextComponents(): Array<out ITextComponent> {
         val lines = getSignText()
         val componentLines = mutableListOf<TextComponentString>()
 
