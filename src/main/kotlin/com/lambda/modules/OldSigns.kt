@@ -57,8 +57,11 @@ internal object OldSigns : PluginModule(
         return renderer
     }
 
-    private fun isOld(metadata: String): Boolean {
+    fun isOld(metadata: String): Boolean {
         return !metadata.contains("""{\"extra\":[{\"text\":""")
+            // Avoid Igloo false-positives.
+            && !metadata.contains("""Text3:"{\"text\":\"----\\u003e\"}""")
+            && !metadata.contains("""Text2:"{\"text\":\"\\u003c----\"}"""")
     }
 
     private fun SafeClientEvent.updateRenderer() {
@@ -107,14 +110,14 @@ internal object OldSigns : PluginModule(
                             else -> GeometryMasks.Quad.ALL
                         }
 
-                        val entity = world.getTileEntity(blockPos)
-                        if (entity !is TileEntitySign) continue
-                        if (entity.signText.none {
+                        val sign = world.getTileEntity(blockPos)
+                        if (sign !is TileEntitySign) continue
+                        if (sign.signText.none {
                                 it.unformattedText.trim().isNotEmpty()
                             }) continue
 
-                        val rot = entity.blockMetadata
-                        val nbt = entity.updatePacket?.nbtCompound ?: continue
+                        val rot = sign.blockMetadata
+                        val nbt = sign.updatePacket?.nbtCompound ?: continue
 
                         val offsetBB = getSignBB(blockPos, facing, rot)
 
@@ -192,7 +195,7 @@ internal object OldSigns : PluginModule(
                     maxY = posY + 0.5 + signHeight
                     maxZ = posZ + 0.5 + signWidth
                 }
-                else -> {
+                else -> { // pro-tip: don't try to rotate an *axis aligned* bounding box :^)
                     return AxisAlignedBB(pos)
                 }
             }
@@ -214,7 +217,6 @@ internal object OldSigns : PluginModule(
                     maxY = posY + 0.5 + signHeight
                     maxZ = posZ + 0.5 + signWidth
                 }
-
             }
         }
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
@@ -223,10 +225,11 @@ internal object OldSigns : PluginModule(
 
     init {
         safeListener<RenderWorldEvent> {
+            if (isDisabled) return@safeListener
             if (renderer == null) {
                 renderer = getRenderer()
             } else {
-                if (timer.tick(133L)) {
+                if (timer.tick(169)) {
                     updateRenderer()
                 }
                 renderer?.render(false)
