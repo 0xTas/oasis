@@ -4,21 +4,14 @@ import java.io.File
 import com.lambda.Oasis
 import java.time.LocalDate
 import com.lambda.Oasis.rCC
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import com.google.common.io.BaseEncoding
 import com.lambda.client.module.Category
 import java.time.format.DateTimeFormatter
 import com.lambda.client.util.FolderUtils
 import net.minecraft.util.text.ITextComponent
-import com.lambda.client.event.SafeClientEvent
 import com.lambda.client.plugin.api.PluginModule
-import com.lambda.client.event.events.PacketEvent
-import com.lambda.client.util.threads.safeListener
 import net.minecraft.util.text.TextComponentString
-import com.lambda.client.util.threads.defaultScope
 import com.lambda.client.util.text.MessageSendHelper
-import net.minecraft.network.play.client.CPacketUpdateSign
 
 
 /**
@@ -40,24 +33,14 @@ internal object SignatureSign : PluginModule(
     private val line4Mode by setting("Line 4 Mode", value = LineMode.CUSTOM, { mode == Mode.TEMPLATE })
     private val line4Text by setting("Line 4 Text", "-=-", { mode == Mode.TEMPLATE })
     private val timestampType by setting("Timestamp Format", value = TimestampType.MMDDYY, { mode == Mode.TEMPLATE })
-    private val packetDelay by setting(
-        "Packet Delay (ms)",
-        value = 2000,
-        range = 0..5000,
-        step = 1,
-        description = "Delay the packet to increase chance of acceptance"
-    )
     private val autoDisable by setting("Auto Disable", value = false, description = "Disable after placing a sign")
-    private val verbose by setting("Verbose", value = false, description = "Prints confirmation messages in the chat")
 
     @Suppress("unused")
     private val openLambdaFolder by setting("Open Lambda Folder...", false, {mode == Mode.READ_FROM_FILE},
         consumer = { _, _ ->
             FolderUtils.openFolder(FolderUtils.lambdaFolder)
             false
-        }, description = "Opens the folder where sigSign.txt should go")
-
-    private var modified = false
+        }, description = "Opens the folder where autosign.txt should go")
 
     private enum class Mode {
         TEMPLATE, READ_FROM_FILE
@@ -75,29 +58,36 @@ internal object SignatureSign : PluginModule(
     }
 
 
-    private fun SafeClientEvent.getSignText(): List<String> {
+    // See MixinGuiEditSign.java
+    fun getSignature(): Array<out ITextComponent> {
+        return getSignTextComponents()
+    }
+
+    fun needsDisabling(): Boolean {
+        return autoDisable
+    }
+
+    private fun getSignText(): List<String> {
         val signText = mutableListOf<String>()
         val player = mc.player
         val username = player?.name ?: return signText
 
         when (mode) {
             Mode.READ_FROM_FILE -> {
-                val file = File(FolderUtils.lambdaFolder + "sigSign.txt")
+                val file = File(FolderUtils.lambdaFolder + "autosign.txt")
 
                 if (file.exists()) {
                     val text = file.readText().replace("§", "").lines()
-
                     for (i in 0 until text.count()) {
-                        if (i >= 4)
-                            break
-                        signText.add(text[i].take(18))
+                        if (i >= 4) break
+                        signText.add(text[i])
                     }
                 } else {
                     signText.add("File not found.")
-                    signText.add("Please create a")
-                    signText.add("\"sigSign.txt\" in")
-                    signText.add("ur lambda folder")
-                    MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §4File Not Found. §fPlease add a §2\"sigSign.txt\" §ffile to your Lambda folder.")
+                    signText.add("Please create an")
+                    signText.add("\"autosign.txt\" in")
+                    signText.add("/lambda folder")
+                    MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §4File Not Found. §fPlease add a §2\"autosign.txt\" §ffile to your Lambda folder.")
                 }
             }
             Mode.TEMPLATE -> {
@@ -106,7 +96,7 @@ internal object SignatureSign : PluginModule(
                     LineMode.EMPTY -> signText.add(" ")
                     LineMode.TIMESTAMP -> signText.add(getTimestamp())
                     LineMode.USERNAME -> signText.add(username)
-                    LineMode.USERNAME_WAS_HERE -> signText.add("$username was here.")
+                    LineMode.USERNAME_WAS_HERE -> signText.add("$username was here")
                     LineMode.OASIS -> signText.add("-☯-")
                     LineMode.BASE64 -> signText.add(BaseEncoding.base64().encode(line1Text.toByteArray()))
                     LineMode.BASE32 -> signText.add(BaseEncoding.base32().encode(line1Text.toByteArray()))
@@ -120,7 +110,7 @@ internal object SignatureSign : PluginModule(
                     LineMode.EMPTY -> signText.add(" ")
                     LineMode.TIMESTAMP -> signText.add(getTimestamp())
                     LineMode.USERNAME -> signText.add(username)
-                    LineMode.USERNAME_WAS_HERE -> signText.add("$username was here.")
+                    LineMode.USERNAME_WAS_HERE -> signText.add("$username was here")
                     LineMode.OASIS -> signText.add("0x4f61736973")
                     LineMode.BASE64 -> signText.add(BaseEncoding.base64().encode(line2Text.toByteArray()))
                     LineMode.BASE32 -> signText.add(BaseEncoding.base32().encode(line2Text.toByteArray()))
@@ -134,7 +124,7 @@ internal object SignatureSign : PluginModule(
                     LineMode.EMPTY -> signText.add(" ")
                     LineMode.TIMESTAMP -> signText.add(getTimestamp())
                     LineMode.USERNAME -> signText.add(username)
-                    LineMode.USERNAME_WAS_HERE -> signText.add("$username was here.")
+                    LineMode.USERNAME_WAS_HERE -> signText.add("$username was here")
                     LineMode.OASIS -> signText.add("${System.currentTimeMillis() / 1000} UTC")
                     LineMode.BASE64 -> signText.add(BaseEncoding.base64().encode(line3Text.toByteArray()))
                     LineMode.BASE32 -> signText.add(BaseEncoding.base32().encode(line3Text.toByteArray()))
@@ -148,7 +138,7 @@ internal object SignatureSign : PluginModule(
                     LineMode.EMPTY -> signText.add(" ")
                     LineMode.TIMESTAMP -> signText.add(getTimestamp())
                     LineMode.USERNAME -> signText.add(username)
-                    LineMode.USERNAME_WAS_HERE -> signText.add("$username was here.")
+                    LineMode.USERNAME_WAS_HERE -> signText.add("$username was here")
                     LineMode.OASIS -> signText.add("-☯-")
                     LineMode.BASE64 -> signText.add(BaseEncoding.base64().encode(line4Text.toByteArray()))
                     LineMode.BASE32 -> signText.add(BaseEncoding.base32().encode(line4Text.toByteArray()))
@@ -163,7 +153,7 @@ internal object SignatureSign : PluginModule(
         return signText
     }
 
-    private fun SafeClientEvent.getSignTextComponents(): Array<out ITextComponent> {
+    private fun getSignTextComponents(): Array<out ITextComponent> {
         val lines = getSignText()
         val componentLines = mutableListOf<TextComponentString>()
 
@@ -193,12 +183,12 @@ internal object SignatureSign : PluginModule(
             TimestampType.DDMMYYYY -> currentDate.format(ddmmyyyy)
             TimestampType.YYYYMMDD -> currentDate.format(yyyymmdd)
             TimestampType.YYYYDDMM -> currentDate.format(yyyyddmm)
-            TimestampType.DAY_MONTH_YEAR -> "${currentDate.dayOfMonth} $currentMonth ${currentDate.year}"
-            TimestampType.MONTH_DAY_YEAR -> "$currentMonth ${currentDate.dayOfMonth} ${currentDate.year}"
+            TimestampType.DAY_MONTH_YEAR -> "${dayOfMonthSuffix(currentDate.dayOfMonth)} $currentMonth ${currentDate.year}"
+            TimestampType.MONTH_DAY_YEAR -> "$currentMonth ${dayOfMonthSuffix(currentDate.dayOfMonth)} ${currentDate.year}"
             TimestampType.MONTH_YEAR -> "$currentMonth ${currentDate.year}"
             TimestampType.YEAR -> currentDate.year.toString()
-            TimestampType.DAY_MONTH -> "${dayOfMonthSuffix(currentDate.dayOfMonth)} of $currentMonth."
-            TimestampType.MONTH_DAY -> "$currentMonth ${dayOfMonthSuffix(currentDate.dayOfMonth)}."
+            TimestampType.DAY_MONTH -> "${dayOfMonthSuffix(currentDate.dayOfMonth)} of $currentMonth"
+            TimestampType.MONTH_DAY -> "$currentMonth ${dayOfMonthSuffix(currentDate.dayOfMonth)}"
             TimestampType.UNIX_EPOCH -> "${System.currentTimeMillis() / 1000} UTC"
         }
     }
@@ -252,36 +242,5 @@ internal object SignatureSign : PluginModule(
 
     private fun ByteArray.toHex(): String {
         return joinToString("") { "%02x".format(it) }
-    }
-
-    init {
-        safeListener<PacketEvent.Send> { packet ->
-            if (isDisabled || packet.packet !is CPacketUpdateSign) return@safeListener
-
-            val signText = getSignTextComponents()
-
-            if (!modified) {
-                defaultScope.launch {
-                    delay(packetDelay.toLong())
-                    player.connection.sendPacket(CPacketUpdateSign((packet.packet as CPacketUpdateSign).position, signText))
-                }
-                packet.cancel()
-                modified = true
-            } else {
-                modified = false
-                return@safeListener
-            }
-
-            if (mode == Mode.TEMPLATE && verbose)
-                MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §fSending templated §2CPacketUpdateSign §fto the server.")
-
-            if (mode == Mode.READ_FROM_FILE && verbose)
-                MessageSendHelper.sendChatMessage("§8[${rCC()}☯§8] §fRead from file into outbound §2CPacketUpdateSign §fpacket.")
-
-            if (autoDisable) {
-                modified = false
-                disable()
-            }
-        }
     }
 }
