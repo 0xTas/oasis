@@ -133,7 +133,7 @@ internal object FarmAura: PluginModule(
         return when (val block = blockState.block) {
             is BlockCrops -> block.isMaxAge(blockState)
             is BlockPumpkin, is BlockMelon -> false // For now..
-            is BlockReed -> world.getBlockState(pos.down()).block is BlockReed
+            is BlockReed -> world.getBlockState(pos.down()).block is BlockReed && world.getBlockState(pos.up()).block is BlockReed
             is BlockNetherWart -> blockState.getValue(BlockNetherWart.AGE) >= 3
             else -> false
         }
