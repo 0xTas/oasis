@@ -27,8 +27,9 @@ It includes a collection of custom modules designed for use on the anarchy serve
 ### Contributing
 1. Clone the repository: `git clone https://github.com/0xTas/oasis`.
 2. Follow the [IDE Setup Instructions](https://github.com/lambda-client/ExamplePlugin#setup-ide) from the Lambda Example-Plugin repo.
-3. Ensure that `Oasis > Tasks > build > build` runs successfully.
-4. You're all set!
+3. Ensure that `Oasis > Tasks > build > build` & `Oasis > Tasks > shadow > shadowJar` run successfully.
+4. When building the final JAR, use the shadowJar task.
+5. You're all set!
 ---
 ### What's Next?
 
