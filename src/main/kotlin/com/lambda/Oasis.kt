@@ -14,6 +14,7 @@ internal object Oasis : Plugin() {
     override fun onLoad() {
         modules.add(FarmAura)
         modules.add(OldSigns)
+        modules.add(TunnelESP)
         commands.add(SegFault)
         modules.add(ChatSigns)
         modules.add(BannerInfo)
