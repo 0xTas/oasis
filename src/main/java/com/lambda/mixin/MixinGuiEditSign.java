@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
 import com.lambda.modules.SignatureSign;
+import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,21 +52,23 @@ public abstract class MixinGuiEditSign extends GuiScreen {
         }
     }
 
-    @Inject(method = "onGuiClosed", at = @At("TAIL"))
+    @Inject(method = "onGuiClosed", at = @At("HEAD"), cancellable = true)
     public void mixinOnGuiClosed(CallbackInfo ci) {
         if (SignatureSign.INSTANCE.isDisabled()) return;
 
         Instant now = Instant.now();
         long elapsed = Duration.between(timeSince, now).toMillis();
-        if (elapsed < 1000) {
-            long delay = (long) (elapsed * 1.5 + 500);
+        if (elapsed < 2000) {
+            ci.cancel();
+            Keyboard.enableRepeatEvents(false);
+            long delay = 2000 - elapsed;
             NetHandlerPlayClient nethandlerplayclient = this.mc.getConnection();
             if (nethandlerplayclient != null) {
                 ScheduledExecutorService send = Executors.newSingleThreadScheduledExecutor();
                 send.schedule(() -> nethandlerplayclient.sendPacket(new CPacketUpdateSign(this.tileSign.getPos(), this.tileSign.signText)), delay, TimeUnit.MILLISECONDS);
             }
+            this.tileSign.setEditable(true);
         }
-
         if (SignatureSign.INSTANCE.needsDisabling()) SignatureSign.INSTANCE.disable();
     }
 }
