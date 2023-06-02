@@ -1,7 +1,9 @@
 {
   "required": false,
   "compatibilityLevel": "JAVA_8",
-  "package": "",
+  "package": "com.lambda.mixin",
   "refmap": "mixins.Oasis.refmap.json",
-  "client": []
+  "client": [
+    "MixinGuiEditSign"
+  ]
 }

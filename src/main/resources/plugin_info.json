@@ -6,6 +6,6 @@
   "authors": [ "Zach (0xTas) <root@0xTas.dev>"],
   "main_class": "com.lambda.Oasis",
   "min_api_version": "3.3",
-  "mixins": [],
+  "mixins": ["mixins.Oasis.json"],
   "required_plugins": []
 }
