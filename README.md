@@ -19,7 +19,7 @@ It includes a collection of custom modules designed for use on the anarchy serve
 | SegFault       | Crashes your game?                                                    | Command only. Type **;segfault**, **;crash**, or **;hcf** to crash your game.                                                                                     | Reference to a joke from the suggestions channel in [Lambda's Discord](https://discord.gg/QjfBxJzE5x). I thought it was funny, so I implemented it :]                                                                                   |
 | UpdateNotifier | Notifies you in chat (once per session) when an update is available.  | Click the link in chat to be taken to the latest release on Github. You can permanently disable this by clicking on it in the **Client** section of the ClickGUI. | It's nice to know when new features or improvements are available without needing to stalk the repo.                                                                                                                                    |
 ---
-### Installation
+### Installation & Updating
 1. Firstly, ensure that Minecraft 1.12.2, Forge, and [Lambda](https://github.com/lambda-client/lambda) are installed.
 2. [Download the plugin](https://github.com/0xTas/oasis/releases/latest/) or [build it from source](https://github.com/0xTas/oasis#contributing).
 3. *Before starting the game*, place the JAR file in your `.minecraft/lambda/plugins` folder.
