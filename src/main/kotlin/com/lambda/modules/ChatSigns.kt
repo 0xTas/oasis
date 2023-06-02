@@ -46,7 +46,7 @@ internal object ChatSigns : PluginModule(
         val startY = 1
         val startZ = playerPos.z - range
         val endX = playerPos.x + range
-        val endY = if (playerPos.y > 125) world.height else 125
+        val endY = if (player.dimension == -1) 125 else world.height
         val endZ = playerPos.z + range
 
         val pos = BlockPos.MutableBlockPos(0,0,0)
@@ -90,8 +90,8 @@ internal object ChatSigns : PluginModule(
             }
             val textOnSignForChat = textBuilder.toString()
 
-            val old = (oldSigns && nbt != null && isOld("$nbt"))
-            val notOld = (oldSigns && nbt != null && !isOld("$nbt"))
+            val old = (oldSigns && nbt != null && OldSigns.isOld("$nbt"))
+            val notOld = (oldSigns && nbt != null && !OldSigns.isOld("$nbt"))
 
             var chatData = when {
                 old -> " §8[§cOLD§8]§f:\n§2§o\"${textOnSignForChat.trimEnd().replace("\n", "\n§2")}\""
@@ -109,10 +109,6 @@ internal object ChatSigns : PluginModule(
 
     private fun signAlreadyLogged(signPos: BlockPos): Boolean {
         return posSet.contains(signPos)
-    }
-
-    private fun isOld(metadata: String): Boolean {
-        return !metadata.contains("""{\"extra\":[{\"text\":""")
     }
 
     init {
