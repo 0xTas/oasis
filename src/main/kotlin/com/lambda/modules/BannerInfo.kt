@@ -24,9 +24,7 @@ internal object BannerInfo : PluginModule(
 
     init {
         safeListener<PlayerInteractEvent.RightClickBlock> {
-            val world = it.world ?: return@safeListener
             val pos = it.pos
-
 
             if (!whyFireTwice && world.getBlockState(pos).block is BlockBanner) {
                 whyFireTwice = true
@@ -34,21 +32,18 @@ internal object BannerInfo : PluginModule(
                 val patterns = banner?.patternList ?: return@safeListener
                 val colors = banner.colorList ?: return@safeListener
 
-                var bannerData = ""
+                val bannerData = StringBuilder()
                 if (banner.hasCustomName()) {
-                    bannerData += "§8[${Oasis.rCC()}☯§8] §f${banner.name}\n"
+                    bannerData.append("§8[${Oasis.rCC()}☯§8] §f${banner.name}\n")
                 }
                 for (i in 0 until patterns.size) {
                     if (i >= colors.size) break
+                    bannerData.append("§8[${Oasis.rCC()}☯§8] §f${colors[i]} ${patterns[i].toString().lowercase()}")
 
-                    bannerData += if (i == patterns.size - 1) {
-                        "§8[${Oasis.rCC()}☯§8] §f${colors[i]} ${patterns[i].toString().lowercase()}"
-                    } else {
-                        "§8[${Oasis.rCC()}☯§8] §f${colors[i]} ${patterns[i].toString().lowercase()}\n"
-                    }
+                    if (i != patterns.size - 1) bannerData.append("\n")
                 }
 
-                MessageSendHelper.sendChatMessage(bannerData)
+                MessageSendHelper.sendChatMessage(bannerData.toString())
             } else if (whyFireTwice) whyFireTwice = false
         }
     }

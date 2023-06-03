@@ -87,9 +87,7 @@ internal object OldSigns : PluginModule(
                 for (y in startY..endY) {
                     for (z in startZ..endZ) {
                         blockPos.setPos(x,y,z)
-                        val state = world.getBlockState(blockPos)
-                        val block = state.block
-
+                        val block = world.getBlockState(blockPos).block
                         if (block !is BlockSign) continue
 
                         val facing: EnumFacing? = try {
