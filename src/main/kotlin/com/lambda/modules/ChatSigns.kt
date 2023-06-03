@@ -64,7 +64,6 @@ internal object ChatSigns : PluginModule(
     }
 
     private fun SafeClientEvent.chatSign(sign: BlockPos) {
-        val world = mc.player?.world ?: return
         val signEntity = world.getTileEntity(sign)
 
         if (signEntity is TileEntitySign) {
@@ -77,12 +76,9 @@ internal object ChatSigns : PluginModule(
             val signY = sign.y
             val signZ = sign.z
 
-            var shouldRet = true
-            for (text in textObjects) {
-                if (text.unformattedText.trim().isNotEmpty())
-                    shouldRet = false
-            }
-            if (shouldRet) return
+            if (textObjects.none {
+                    it.unformattedText.trim().isNotEmpty()
+                }) return
 
             val textBuilder = StringBuilder()
             for (text in textObjects) {
@@ -91,14 +87,9 @@ internal object ChatSigns : PluginModule(
             val textOnSignForChat = textBuilder.toString()
 
             val old = (oldSigns && nbt != null && OldSigns.isOld("$nbt"))
-            val notOld = (oldSigns && nbt != null && !OldSigns.isOld("$nbt"))
-
             var chatData = when {
                 old -> " §8[§cOLD§8]§f:\n§2§o\"${textOnSignForChat.trimEnd().replace("\n", "\n§2")}\""
-                notOld && showCoords -> "\n§o\"${textOnSignForChat.trimEnd()}\""
-                notOld && !showCoords -> "§o\"${textOnSignForChat.trimEnd()}\""
-                showCoords -> "\n§o\"${textOnSignForChat.trimEnd()}\""
-                else ->"§o\"${textOnSignForChat.trimEnd()}\""
+                else -> "\n§o\"${textOnSignForChat.trimEnd()}\""
             }
             if (displayMode == DisplayMode.COMPACT) chatData = chatData.replace("\n", " ")
             val coords = if (showCoords) " [§f${signX}§8, §f${signY}§8, §f${signZ}§8]§f: " else " "
