@@ -15,6 +15,7 @@ import com.lambda.client.util.threads.safeListener
 import com.lambda.client.util.graphics.ESPRenderer
 import com.lambda.client.util.graphics.GeometryMasks
 import com.lambda.client.event.events.RenderWorldEvent
+import com.lambda.client.module.modules.movement.ElytraFlight
 
 
 /**
@@ -27,38 +28,38 @@ internal object TunnelESP: PluginModule(
     pluginMain = Oasis
 ){
     private val mode by setting(
-        "Render Style", value = RenderMode.TUNNEL, description = "Recommended: Tunnel for NR, Base for OW")
-    private val fill by setting("Base Fill", value = true, {mode == RenderMode.BASE})
-    private val outline by setting("Base Outline", value = true, {mode == RenderMode.BASE})
-    private val tracer by setting("Base Tracer", value = false, {mode == RenderMode.BASE})
+        "Render Style", value = RenderMode.TUNNEL, description = "Recommend Tunnel for NR Efly, Floor for OW Efly")
+    private val fill by setting("Base Fill", value = true, {mode == RenderMode.FLOOR})
+    private val outline by setting("Base Outline", value = true, {mode == RenderMode.FLOOR})
+    private val tracer by setting("Base Tracer", value = false, {mode == RenderMode.FLOOR})
     private val color by setting(
-        "Base Color", ColorHolder(41, 210, 146), false, {mode == RenderMode.BASE})
+        "Floor Color", ColorHolder(41, 118, 210), false, {mode == RenderMode.FLOOR})
     private val aFill by setting(
-        "Base Fill Opacity", value = 69, range = 0..255, step = 1, {fill && mode == RenderMode.BASE})
+        "Floor Fill Opacity", value = 69, range = 0..255, step = 1, {fill && mode == RenderMode.FLOOR})
     private val aOutline by setting(
-        "Base Outline Opacity", value = 133, range = 0..255, step = 1, {outline && mode == RenderMode.BASE})
+        "Floor Outline Opacity", value = 133, range = 0..255, step = 1, {outline && mode == RenderMode.FLOOR})
     private val aTracer by setting(
-        "Base Tracer Opacity", value = 20, range = 0..255, step = 1, {tracer && mode == RenderMode.BASE})
+        "Floor Tracer Opacity", value = 20, range = 0..255, step = 1, {tracer && mode == RenderMode.FLOOR})
     private val tunFill by setting("Tunnel Fill", value = true, {mode == RenderMode.TUNNEL})
     private val tunOutline by setting("Tunnel Outline", value = true, {mode == RenderMode.TUNNEL})
     private val tunTracer by setting("Tunnel Tracer", value = false, {mode == RenderMode.TUNNEL})
     private val tunColor by setting(
-        "Tunnel Color", ColorHolder(41, 210, 146), false, {mode == RenderMode.TUNNEL})
+        "Tunnel Color", ColorHolder(41, 118, 210), false, {mode == RenderMode.TUNNEL})
     private val aTunFill by setting(
-        "Tunnel Fill Opacity", value = 10, range = 0..255, step = 1, {tunFill && mode == RenderMode.TUNNEL})
+        "Tunnel Fill Opacity", value = 48, range = 0..255, step = 1, {tunFill && mode == RenderMode.TUNNEL})
     private val aTunOutline by setting(
-        "Tunnel Outline Opacity", value = 11, range = 0..255, step = 1, {tunOutline && mode == RenderMode.TUNNEL})
+        "Tunnel Outline Opacity", value = 24, range = 0..255, step = 1, {tunOutline && mode == RenderMode.TUNNEL})
     private val aTunTracer by setting(
         "Tunnel Tracer Opacity", value = 20, range = 0..255, step = 1, {tunTracer && mode == RenderMode.TUNNEL})
-    private val eFly by setting(
-        "Overworld Efly Mode",
-        value = false, description = "Don't bother scanning above the player, but scan down to bedrock")
+    private val chunkRange by setting(
+        "Chunk Range", value = 4, range = 1..8, step = 1, description = "Increase this if your PC is a Gigachad"
+    )
 
     private val timer = TickTimer()
     private var renderer: ESPRenderer? = null
 
     private enum class RenderMode {
-        BASE, TUNNEL
+        FLOOR, TUNNEL
     }
 
 
@@ -87,7 +88,7 @@ internal object TunnelESP: PluginModule(
     private fun SafeClientEvent.updateRenderer() {
         val renderColor: ColorHolder
         when (mode) {
-            RenderMode.BASE -> {
+            RenderMode.FLOOR -> {
                 renderColor = color
                 renderer?.aFilled = if (fill) aFill else 0
                 renderer?.aOutline = if (outline) aOutline else 0
@@ -102,19 +103,22 @@ internal object TunnelESP: PluginModule(
         }
 
         defaultScope.launch {
+            val neededQuads = ArrayList<Int>()
             val tunnels = ArrayList<BlockPos>()
             val cache = ArrayList<Triple<AxisAlignedBB, ColorHolder, Int>>()
             val tPos = player.position
             val dim = player.dimension
 
-            val range = 4 * 16
+            val range = chunkRange * 16
             val startX = tPos.x - range
             val endX = tPos.x + range
             val startZ = tPos.z - range
             val endZ = tPos.z + range
             val startY = 2
-            val endY = if (dim == -1 || eFly) {
-                if (dim == -1) 121 else player.posY.toInt()
+            val endY = if (dim == -1) {
+                121
+            } else if (ElytraFlight.isEnabled) {
+                tPos.y
             } else {
                 (tPos.y + range).coerceAtMost(world.height)
             }
@@ -133,23 +137,59 @@ internal object TunnelESP: PluginModule(
                         if (north && air(node.up().north())) {
                             if (isNorthSouthTunnel(node, west, northWest)) {
                                 tunnels.add(BlockPos(node.x, node.y, node.z))
+                                if (air(node.south()) && air(node.up().south())) {
+                                    neededQuads.add(
+                                        GeometryMasks.Quad.DOWN or GeometryMasks.Quad.EAST or GeometryMasks.Quad.WEST
+                                    )
+                                    neededQuads.add(
+                                        GeometryMasks.Quad.UP or GeometryMasks.Quad.EAST or GeometryMasks.Quad.WEST
+                                    )
+                                } else {
+                                    neededQuads.add(
+                                        GeometryMasks.Quad.DOWN or GeometryMasks.Quad.EAST
+                                            or GeometryMasks.Quad.WEST or GeometryMasks.Quad.SOUTH
+                                    )
+                                    neededQuads.add(
+                                        GeometryMasks.Quad.UP or GeometryMasks.Quad.EAST
+                                            or GeometryMasks.Quad.WEST or GeometryMasks.Quad.SOUTH
+                                    )
+                                }
                                 continue
                             }
                         }
                         if (west && air(node.up().west())) {
                             if (isEastWestTunnel(node, north, northWest)) {
                                 tunnels.add(BlockPos(node.x, node.y, node.z))
+                                if (air(node.east()) && air(node.up().east())) {
+                                    neededQuads.add(
+                                        GeometryMasks.Quad.DOWN or GeometryMasks.Quad.NORTH or GeometryMasks.Quad.SOUTH
+                                    )
+                                    neededQuads.add(
+                                        GeometryMasks.Quad.UP or GeometryMasks.Quad.NORTH or GeometryMasks.Quad.SOUTH
+                                    )
+                                } else {
+                                    neededQuads.add(
+                                        GeometryMasks.Quad.DOWN or GeometryMasks.Quad.NORTH
+                                            or GeometryMasks.Quad.SOUTH or GeometryMasks.Quad.EAST
+                                    )
+                                    neededQuads.add(
+                                        GeometryMasks.Quad.UP or GeometryMasks.Quad.NORTH
+                                            or GeometryMasks.Quad.SOUTH or GeometryMasks.Quad.EAST
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
 
+            var i = 0
             for (tunnel in tunnels) {
                 if (mode == RenderMode.TUNNEL) {
-                    cache.add(Triple(AxisAlignedBB(tunnel), renderColor, GeometryMasks.Quad.ALL))
-                    cache.add(Triple(AxisAlignedBB(tunnel.up()), renderColor, GeometryMasks.Quad.ALL))
+                    cache.add(Triple(AxisAlignedBB(tunnel), renderColor, neededQuads[i]))
+                    cache.add(Triple(AxisAlignedBB(tunnel.up()), renderColor, neededQuads[i + 1]))
                 } else cache.add(Triple(AxisAlignedBB(tunnel), renderColor, GeometryMasks.Quad.DOWN))
+                i += 2
             }
 
             renderer?.replaceAll(cache)
