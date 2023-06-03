@@ -56,7 +56,6 @@ internal object TunnelESP: PluginModule(
 
     private val timer = TickTimer()
     private var renderer: ESPRenderer? = null
-    private val tunnels = ArrayList<BlockPos>()
 
     private enum class RenderMode {
         BASE, TUNNEL
@@ -102,8 +101,8 @@ internal object TunnelESP: PluginModule(
             }
         }
 
-        tunnels.clear()
         defaultScope.launch {
+            val tunnels = ArrayList<BlockPos>()
             val cache = ArrayList<Triple<AxisAlignedBB, ColorHolder, Int>>()
             val tPos = player.position
             val dim = player.dimension
@@ -140,7 +139,6 @@ internal object TunnelESP: PluginModule(
                         if (west && air(node.up().west())) {
                             if (isEastWestTunnel(node, north, northWest)) {
                                 tunnels.add(BlockPos(node.x, node.y, node.z))
-                                continue
                             }
                         }
                     }
