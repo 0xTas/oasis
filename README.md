@@ -24,7 +24,7 @@ It includes a collection of custom modules designed for use on the anarchy serve
 2. [Download the plugin](https://github.com/0xTas/oasis/releases/latest/) or [build it from source](https://github.com/0xTas/oasis#contributing).
 3. *Before starting the game*, place the JAR file in your `.minecraft/lambda/plugins` folder.
 ---
-### Contributing
+### Building & Contributing
 1. Clone the repository: `git clone https://github.com/0xTas/oasis`.
 2. Follow the [IDE Setup Instructions](https://github.com/lambda-client/ExamplePlugin#setup-ide) from the Lambda Example-Plugin repo.
 3. Ensure that `Oasis > Tasks > build > build` & `Oasis > Tasks > shadow > shadowJar` run successfully.
@@ -34,7 +34,7 @@ It includes a collection of custom modules designed for use on the anarchy serve
 ### What's Next?
 
 I plan to support this plugin for the foreseeable future, as I get regular use out of it myself.<br>
-New modules may be added from time-to-time as I think of them and get them to a shareable state.<br>
+New modules may be added occasionally as I think of them and get them to a shareable state.<br>
 If you encounter any bugs or have any suggestions, feel free to [open an issue](https://github.com/0xTas/oasis/issues/new), and I'll address it when I can.
 <br><br>
 > ### Disclaimer
