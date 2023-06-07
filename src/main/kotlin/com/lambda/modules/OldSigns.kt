@@ -21,7 +21,7 @@ import com.lambda.client.event.events.RenderWorldEvent
 
 
 /**
- * @author 0xTas [Tas#1337] <root@0xTas.dev>
+ * @author 0xTas [@0xTas] <root@0xTas.dev>
  */
 internal object OldSigns : PluginModule(
     name = "OldSigns",
@@ -94,20 +94,6 @@ internal object OldSigns : PluginModule(
                             world.getBlockState(blockPos).getValue(BlockHorizontal.FACING)
                         }catch (err: IllegalArgumentException) {null}
 
-                        val quad = when (mode) {
-                            RenderMode.BASE -> {
-                                val side = when (facing) {
-                                    EnumFacing.EAST -> GeometryMasks.Quad.WEST
-                                    EnumFacing.WEST -> GeometryMasks.Quad.EAST
-                                    EnumFacing.NORTH -> GeometryMasks.Quad.SOUTH
-                                    EnumFacing.SOUTH -> GeometryMasks.Quad.NORTH
-                                    else -> GeometryMasks.Quad.DOWN
-                                }
-                                side
-                            }
-                            else -> GeometryMasks.Quad.ALL
-                        }
-
                         val sign = world.getTileEntity(blockPos)
                         if (sign !is TileEntitySign) continue
                         if (sign.signText.none {
@@ -116,10 +102,9 @@ internal object OldSigns : PluginModule(
 
                         val rot = sign.blockMetadata
                         val nbt = sign.updatePacket?.nbtCompound ?: continue
-
-                        val offsetBB = getSignBB(blockPos, facing, rot)
-
                         if (isOld("$nbt")) {
+                            val quad = getSignQuad(facing)
+                            val offsetBB = getSignBB(blockPos, facing, rot)
                             cache.add(Triple(offsetBB, color, quad))
                         }
                     }
@@ -129,10 +114,26 @@ internal object OldSigns : PluginModule(
         }
     }
 
+    private fun getSignQuad(facing: EnumFacing?): Int {
+        return when (mode) {
+            RenderMode.BASE -> {
+                val side = when (facing) {
+                    EnumFacing.EAST -> GeometryMasks.Quad.WEST
+                    EnumFacing.WEST -> GeometryMasks.Quad.EAST
+                    EnumFacing.NORTH -> GeometryMasks.Quad.SOUTH
+                    EnumFacing.SOUTH -> GeometryMasks.Quad.NORTH
+                    else -> GeometryMasks.Quad.DOWN
+                }
+                side
+            }
+            else -> GeometryMasks.Quad.ALL
+        }
+    }
+
     private fun getSignBB(pos: BlockPos, facing: EnumFacing?, rot: Int): AxisAlignedBB {
         val signWidth = 0.5
-        var signHeight = 0.75
-        val signDepth = 0.07
+        val signHeight = 0.25
+        val signDepth = 0.04
 
         var standing = false
         var posX = pos.x.toDouble()
@@ -143,24 +144,22 @@ internal object OldSigns : PluginModule(
             RenderMode.SIGN -> {
                 when (facing) {
                     EnumFacing.NORTH -> {
-                        posZ += 0.42
-                        signHeight /= 2.7
+                        posZ += 0.44
+                        posY += 0.03
                     }
                     EnumFacing.SOUTH -> {
-                        posZ -= 0.42
-                        signHeight /= 2.7
+                        posZ -= 0.44
+                        posY += 0.03
                     }
                     EnumFacing.EAST -> {
-                        posX -= 0.42
-                        signHeight /= 2.7
+                        posX -= 0.44
+                        posY += 0.03
                     }
                     EnumFacing.WEST -> {
-                        posX += 0.42
-                        signHeight /= 2.7
+                        posX += 0.44
+                        posY += 0.03
                     }
                     else -> {
-                        posY += 0.32
-                        signHeight /= 3
                         standing = true
                     }
                 }
@@ -178,6 +177,7 @@ internal object OldSigns : PluginModule(
         if (standing) {
             when (rot) {
                 0, 8 -> { // North & South
+                    posY += 0.32
                     minX = posX + 0.5 - signWidth
                     minY = posY + 0.5 - signHeight
                     minZ = posZ + 0.5 - signDepth
@@ -186,6 +186,7 @@ internal object OldSigns : PluginModule(
                     maxZ = posZ + 0.5 + signDepth
                 }
                 4, 12 -> { // East & West
+                    posY += 0.32
                     minX = posX + 0.5 - signDepth
                     minY = posY + 0.5 - signHeight
                     minZ = posZ + 0.5 - signWidth
