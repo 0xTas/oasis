@@ -11,7 +11,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent
 
 
 /**
- * @author 0xTas [Tas#1337] <root@0xTas.dev>
+ * @author 0xTas [0xTas] <root@0xTas.dev>
  */
 internal object BannerInfo : PluginModule(
     name = "BannerInfo",

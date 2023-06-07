@@ -39,7 +39,7 @@ import com.lambda.client.event.events.RenderWorldEvent
 
 
 /**
- * @author 0xTas [Tas#1337] <root@0xTas.dev>
+ * @author 0xTas [@0xTas] <root@0xTas.dev>
  */
 internal object FarmAura: PluginModule(
     name = "FarmAura",

@@ -8,7 +8,7 @@ import com.lambda.client.plugin.api.Plugin
 
 
 /**
- * @author 0xTas [Tas#1337] <root@0xTas.dev>
+ * @author 0xTas [@0xTas] <root@0xTas.dev>
  */
 internal object Oasis : Plugin() {
     override fun onLoad() {

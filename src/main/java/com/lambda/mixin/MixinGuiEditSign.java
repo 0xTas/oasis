@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 /**
- * @author 0xTas [Tas#1337] <root@0xTas.dev>
+ * @author 0xTas [@0xTas] <root@0xTas.dev>
  */
 @Mixin(GuiEditSign.class)
 public abstract class MixinGuiEditSign extends GuiScreen {
