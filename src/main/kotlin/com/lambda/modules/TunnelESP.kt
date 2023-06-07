@@ -7,19 +7,22 @@ import net.minecraft.util.math.BlockPos
 import com.lambda.client.util.TickTimer
 import com.lambda.client.module.Category
 import net.minecraft.util.math.AxisAlignedBB
+import it.unimi.dsi.fastutil.ints.IntArrayList
 import com.lambda.client.event.SafeClientEvent
 import com.lambda.client.util.color.ColorHolder
+import it.unimi.dsi.fastutil.longs.LongArrayList
 import com.lambda.client.plugin.api.PluginModule
 import com.lambda.client.util.threads.defaultScope
 import com.lambda.client.util.threads.safeListener
 import com.lambda.client.util.graphics.ESPRenderer
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import com.lambda.client.util.graphics.GeometryMasks
 import com.lambda.client.event.events.RenderWorldEvent
 import com.lambda.client.module.modules.movement.ElytraFlight
 
 
 /**
- * @author 0xTas [Tas#1337] <root@0xTas.dev>
+ * @author 0xTas [@0xTas] <root@0xTas.dev>
  */
 internal object TunnelESP: PluginModule(
     name = "TunnelESP",
@@ -28,10 +31,10 @@ internal object TunnelESP: PluginModule(
     pluginMain = Oasis
 ){
     private val mode by setting(
-        "Render Style", value = RenderMode.TUNNEL, description = "Recommend Tunnel for NR Efly, Floor for OW Efly")
-    private val fill by setting("Base Fill", value = true, {mode == RenderMode.FLOOR})
-    private val outline by setting("Base Outline", value = true, {mode == RenderMode.FLOOR})
-    private val tracer by setting("Base Tracer", value = false, {mode == RenderMode.FLOOR})
+        "Render Style", value = RenderMode.TUNNEL, description = "Recommend Tunnel for NR, Floor for OW")
+    private val fill by setting("Floor Fill", value = true, {mode == RenderMode.FLOOR})
+    private val outline by setting("Floor Outline", value = true, {mode == RenderMode.FLOOR})
+    private val tracer by setting("Floor Tracer", value = false, {mode == RenderMode.FLOOR})
     private val color by setting(
         "Floor Color", ColorHolder(41, 118, 210), false, {mode == RenderMode.FLOOR})
     private val aFill by setting(
@@ -52,7 +55,7 @@ internal object TunnelESP: PluginModule(
     private val aTunTracer by setting(
         "Tunnel Tracer Opacity", value = 20, range = 0..255, step = 1, {tunTracer && mode == RenderMode.TUNNEL})
     private val chunkRange by setting(
-        "Chunk Range", value = 4, range = 1..8, step = 1, description = "Increase this if your PC is a Gigachad"
+        "Chunk Range", value = 5, range = 1..5, step = 1, description = "Decrease this (or allocate more RAM) if laggy"
     )
 
     private val timer = TickTimer()
@@ -103,9 +106,9 @@ internal object TunnelESP: PluginModule(
         }
 
         defaultScope.launch {
-            val neededQuads = ArrayList<Int>()
-            val tunnels = ArrayList<BlockPos>()
-            val cache = ArrayList<Triple<AxisAlignedBB, ColorHolder, Int>>()
+            val tunnels = LongArrayList()
+            val neededQuads = IntArrayList()
+            val cache = ObjectArrayList<Triple<AxisAlignedBB, ColorHolder, Int>>()
             val tPos = player.position
             val dim = player.dimension
 
@@ -114,7 +117,7 @@ internal object TunnelESP: PluginModule(
             val endX = tPos.x + range
             val startZ = tPos.z - range
             val endZ = tPos.z + range
-            val startY = 2
+            val startY = 5
             val endY = if (dim == -1) {
                 121
             } else if (ElytraFlight.isEnabled) {
@@ -136,7 +139,7 @@ internal object TunnelESP: PluginModule(
 
                         if (north && air(node.up().north())) {
                             if (isNorthSouthTunnel(node, west, northWest)) {
-                                tunnels.add(BlockPos(node.x, node.y, node.z))
+                                tunnels.add(node.toLong())
                                 if (air(node.south()) && air(node.up().south())) {
                                     neededQuads.add(
                                         GeometryMasks.Quad.DOWN or GeometryMasks.Quad.EAST or GeometryMasks.Quad.WEST
@@ -159,7 +162,7 @@ internal object TunnelESP: PluginModule(
                         }
                         if (west && air(node.up().west())) {
                             if (isEastWestTunnel(node, north, northWest)) {
-                                tunnels.add(BlockPos(node.x, node.y, node.z))
+                                tunnels.add(node.toLong())
                                 if (air(node.east()) && air(node.up().east())) {
                                     neededQuads.add(
                                         GeometryMasks.Quad.DOWN or GeometryMasks.Quad.NORTH or GeometryMasks.Quad.SOUTH
@@ -186,9 +189,10 @@ internal object TunnelESP: PluginModule(
             var i = 0
             for (tunnel in tunnels) {
                 if (mode == RenderMode.TUNNEL) {
-                    cache.add(Triple(AxisAlignedBB(tunnel), renderColor, neededQuads[i]))
-                    cache.add(Triple(AxisAlignedBB(tunnel.up()), renderColor, neededQuads[i + 1]))
-                } else cache.add(Triple(AxisAlignedBB(tunnel), renderColor, GeometryMasks.Quad.DOWN))
+                    val pos = BlockPos.fromLong(tunnel)
+                    cache.add(Triple(AxisAlignedBB(pos), renderColor, neededQuads.getInt(i)))
+                    cache.add(Triple(AxisAlignedBB(pos.up()), renderColor, neededQuads.getInt(i + 1)))
+                } else cache.add(Triple(AxisAlignedBB(BlockPos.fromLong(tunnel)), renderColor, GeometryMasks.Quad.DOWN))
                 i += 2
             }
 
