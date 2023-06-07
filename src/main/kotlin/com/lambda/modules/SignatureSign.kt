@@ -15,7 +15,7 @@ import com.lambda.client.util.text.MessageSendHelper
 
 
 /**
- * @author 0xTas [Tas#1337] <root@0xTas.dev>
+ * @author 0xTas [@0xTas] <root@0xTas.dev>
  */
 internal object SignatureSign : PluginModule(
     name = "Signature Sign",
@@ -25,14 +25,14 @@ internal object SignatureSign : PluginModule(
 ) {
     private val mode by setting("Mode", value = Mode.TEMPLATE)
     private val line1Mode by setting("Line 1 Mode", value = LineMode.CUSTOM, { mode == Mode.TEMPLATE })
-    private val line1Text by setting("Line 1 Text", "-=-", { mode == Mode.TEMPLATE })
+    private val line1Text by setting("Line 1 Text", "-=-", { mode == Mode.TEMPLATE &&  lineTextVisibility(1) })
     private val line2Mode by setting("Line 2 Mode", value = LineMode.USERNAME_WAS_HERE, { mode == Mode.TEMPLATE })
-    private val line2Text by setting("Line 2 Text", "", { mode == Mode.TEMPLATE })
+    private val line2Text by setting("Line 2 Text", "", { mode == Mode.TEMPLATE  &&  lineTextVisibility(2)})
     private val line3Mode by setting("Line 3 Mode", value = LineMode.TIMESTAMP, { mode == Mode.TEMPLATE })
-    private val line3Text by setting("Line 3 Text", "", { mode == Mode.TEMPLATE })
+    private val line3Text by setting("Line 3 Text", "", { mode == Mode.TEMPLATE  &&  lineTextVisibility(3)})
     private val line4Mode by setting("Line 4 Mode", value = LineMode.CUSTOM, { mode == Mode.TEMPLATE })
-    private val line4Text by setting("Line 4 Text", "-=-", { mode == Mode.TEMPLATE })
-    private val timestampType by setting("Timestamp Format", value = TimestampType.MMDDYY, { mode == Mode.TEMPLATE })
+    private val line4Text by setting("Line 4 Text", "-=-", { mode == Mode.TEMPLATE  &&  lineTextVisibility(4)})
+    private val timestampType by setting("Timestamp Format", value = TimestampType.MMDDYY, { mode == Mode.TEMPLATE && timeVisibility()})
     private val autoDisable by setting("Auto Disable", value = false, description = "Disable after placing a sign")
 
     @Suppress("unused")
@@ -67,6 +67,38 @@ internal object SignatureSign : PluginModule(
         return autoDisable
     }
 
+    private fun timeVisibility(): Boolean {
+        return line1Mode == LineMode.TIMESTAMP || line2Mode == LineMode.TIMESTAMP
+            || line3Mode == LineMode.TIMESTAMP || line4Mode == LineMode.TIMESTAMP
+    }
+
+    private fun lineTextVisibility(line: Int): Boolean {
+        val modeCon = mode == Mode.TEMPLATE
+        when (line) {
+            1 -> {
+                return modeCon && line1Mode != LineMode.EMPTY && line1Mode != LineMode.USERNAME
+                    && line1Mode != LineMode.USERNAME_WAS_HERE && line1Mode != LineMode.TIMESTAMP
+                    && line1Mode != LineMode.OASIS
+            }
+            2 -> {
+                return modeCon && line2Mode != LineMode.EMPTY && line2Mode != LineMode.USERNAME
+                    && line2Mode != LineMode.USERNAME_WAS_HERE && line2Mode != LineMode.TIMESTAMP
+                    && line2Mode != LineMode.OASIS
+            }
+            3 -> {
+                return modeCon && line3Mode != LineMode.EMPTY && line3Mode != LineMode.USERNAME
+                    && line3Mode != LineMode.USERNAME_WAS_HERE && line3Mode != LineMode.TIMESTAMP
+                    && line3Mode != LineMode.OASIS
+            }
+            4 -> {
+                return modeCon && line4Mode != LineMode.EMPTY && line4Mode != LineMode.USERNAME
+                    && line4Mode != LineMode.USERNAME_WAS_HERE && line4Mode != LineMode.TIMESTAMP
+                    && line4Mode != LineMode.OASIS
+            }
+            else -> return true
+        }
+    }
+
     private fun getSignText(): List<String> {
         val signText = mutableListOf<String>()
         val player = mc.player
@@ -97,7 +129,7 @@ internal object SignatureSign : PluginModule(
                     LineMode.TIMESTAMP -> signText.add(getTimestamp())
                     LineMode.USERNAME -> signText.add(username)
                     LineMode.USERNAME_WAS_HERE -> signText.add("$username was here")
-                    LineMode.OASIS -> signText.add("-☯-")
+                    LineMode.OASIS -> signText.add("<☯>")
                     LineMode.BASE64 -> signText.add(BaseEncoding.base64().encode(line1Text.toByteArray()))
                     LineMode.BASE32 -> signText.add(BaseEncoding.base32().encode(line1Text.toByteArray()))
                     LineMode.ZxHEX -> signText.add("0x${line1Text.toByteArray().toHex()}")
@@ -111,7 +143,7 @@ internal object SignatureSign : PluginModule(
                     LineMode.TIMESTAMP -> signText.add(getTimestamp())
                     LineMode.USERNAME -> signText.add(username)
                     LineMode.USERNAME_WAS_HERE -> signText.add("$username was here")
-                    LineMode.OASIS -> signText.add("0x4f61736973")
+                    LineMode.OASIS -> signText.add("<$username>")
                     LineMode.BASE64 -> signText.add(BaseEncoding.base64().encode(line2Text.toByteArray()))
                     LineMode.BASE32 -> signText.add(BaseEncoding.base32().encode(line2Text.toByteArray()))
                     LineMode.ZxHEX -> signText.add("0x${line2Text.toByteArray().toHex()}")
@@ -139,7 +171,7 @@ internal object SignatureSign : PluginModule(
                     LineMode.TIMESTAMP -> signText.add(getTimestamp())
                     LineMode.USERNAME -> signText.add(username)
                     LineMode.USERNAME_WAS_HERE -> signText.add("$username was here")
-                    LineMode.OASIS -> signText.add("-☯-")
+                    LineMode.OASIS -> signText.add("<☯>")
                     LineMode.BASE64 -> signText.add(BaseEncoding.base64().encode(line4Text.toByteArray()))
                     LineMode.BASE32 -> signText.add(BaseEncoding.base32().encode(line4Text.toByteArray()))
                     LineMode.ZxHEX -> signText.add("0x${line4Text.toByteArray().toHex()}")
