@@ -4,6 +4,7 @@ import java.net.URL
 import com.lambda.Oasis
 import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
+import com.lambda.client.LambdaMod
 import net.minecraft.util.text.Style
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,7 +21,7 @@ import com.lambda.client.event.events.RenderWorldEvent
 
 
 /**
- * @author 0xTas [@0xTas] <root@0xTas.dev>
+ * @author Tas [@0xTas] <root@0xTas.dev>
  */
 internal object UpdateNotifier: PluginModule(
     name = "OasisUpdates",
@@ -47,17 +48,24 @@ internal object UpdateNotifier: PluginModule(
         safeListener<RenderWorldEvent> {
             if (notified || isDisabled) return@safeListener
 
-            if (timer.tick(4269)) {
+            if (timer.tick(42069)) {
                 defaultScope.launch {
-                    val req = withContext(Dispatchers.IO) {
-                        URL(releaseURL).openConnection()
-                    } as HttpURLConnection
-                    req.instanceFollowRedirects = false
-                    withContext(Dispatchers.IO) {
-                        req.connect()
+                    val req: HttpURLConnection
+                    val resURL: String
+                    try {
+                        req = withContext(Dispatchers.IO) {
+                            URL(releaseURL).openConnection()
+                        } as HttpURLConnection
+                        req.instanceFollowRedirects = false
+                        withContext(Dispatchers.IO) {
+                            req.connect()
+                        }
+                        resURL = req.getHeaderField("Location")
+                    } catch (e: Exception) {
+                        LambdaMod.LOG.warn("Oasis Update Notifier failed to make a connection! - $e")
+                        return@launch
                     }
 
-                    val resURL = req.getHeaderField("Location")
                     if (!resURL.endsWith(version)) {
                         val newVersion = extractNewVersionNumber(resURL)
                         val linkText = TextComponentString("§8[${Oasis.rCC()}☯§8] §7Click §a§ohere §7to open the Github page§f.")
