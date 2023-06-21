@@ -4,14 +4,16 @@ import java.util.*
 import com.lambda.modules.*
 import com.lambda.huds.NotepadHud
 import com.lambda.commands.SegFault
+import com.lambda.commands.LastSeen
 import com.lambda.client.plugin.api.Plugin
 
 
 /**
- * @author 0xTas [@0xTas] <root@0xTas.dev>
+ * @author Tas [@0xTas] <root@0xTas.dev>
  */
 internal object Oasis : Plugin() {
     override fun onLoad() {
+        commands.add(LastSeen)
         modules.add(FarmAura)
         modules.add(OldSigns)
         modules.add(TunnelESP)
