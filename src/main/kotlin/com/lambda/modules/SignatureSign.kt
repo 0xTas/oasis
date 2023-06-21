@@ -15,7 +15,7 @@ import com.lambda.client.util.text.MessageSendHelper
 
 
 /**
- * @author 0xTas [@0xTas] <root@0xTas.dev>
+ * @author Tas [@0xTas] <root@0xTas.dev>
  */
 internal object SignatureSign : PluginModule(
     name = "Signature Sign",

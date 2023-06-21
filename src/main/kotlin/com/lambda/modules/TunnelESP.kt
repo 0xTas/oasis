@@ -22,7 +22,7 @@ import com.lambda.client.module.modules.movement.ElytraFlight
 
 
 /**
- * @author 0xTas [@0xTas] <root@0xTas.dev>
+ * @author Tas [@0xTas] <root@0xTas.dev>
  */
 internal object TunnelESP: PluginModule(
     name = "TunnelESP",

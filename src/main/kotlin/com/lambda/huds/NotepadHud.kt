@@ -7,7 +7,7 @@ import com.lambda.client.plugin.api.PluginLabelHud
 
 
 /**
- * @author 0xTas [@0xTas] <root@0xTas.dev>
+ * @author Tas [@0xTas] <root@0xTas.dev>
  */
 internal object NotepadHud : PluginLabelHud(
     name = "Notepad",
