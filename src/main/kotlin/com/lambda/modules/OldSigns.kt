@@ -21,7 +21,7 @@ import com.lambda.client.event.events.RenderWorldEvent
 
 
 /**
- * @author 0xTas [@0xTas] <root@0xTas.dev>
+ * @author Tas [@0xTas] <root@0xTas.dev>
  */
 internal object OldSigns : PluginModule(
     name = "OldSigns",
@@ -58,7 +58,7 @@ internal object OldSigns : PluginModule(
     }
 
     fun isOld(metadata: String): Boolean {
-        return !metadata.contains("""{\"extra\":[{\"text\":""")
+        return !metadata.contains("""{\"extra\":[{\"""")
             // Avoid Igloo false-positives.
             && !metadata.contains("""Text3:"{\"text\":\"----\\u003e\"}""")
             && !metadata.contains("""Text2:"{\"text\":\"\\u003c----\"}"""")
