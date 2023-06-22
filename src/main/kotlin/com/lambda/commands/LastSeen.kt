@@ -88,7 +88,7 @@ object LastSeen : ClientCommand(
                             val date = inputFormatter.parse(lastSeen)
                             val output = outputFormatter.format(date)
 
-                            val seen = output.replace(", ", ", at ")
+                            val seen = output.replace(", ", ", §fat §2")
                             MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §2$playerName §fwas last seen on §2$seen.")
                         } else {
                             MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §4That player has not been seen..")
