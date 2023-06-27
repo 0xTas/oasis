@@ -17,6 +17,7 @@ internal object Oasis : Plugin() {
         modules.add(FarmAura)
         modules.add(OldSigns)
         modules.add(TunnelESP)
+        modules.add(StaircaseESP)
         commands.add(SegFault)
         modules.add(ChatSigns)
         modules.add(BannerInfo)
