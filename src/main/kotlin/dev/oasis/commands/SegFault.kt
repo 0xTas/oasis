@@ -1,8 +1,8 @@
-package com.lambda.commands
+package dev.oasis.commands
 
 import java.util.*
 import sun.misc.Unsafe
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import com.lambda.client.command.ClientCommand
 import com.lambda.client.util.text.MessageSendHelper
 

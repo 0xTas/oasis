@@ -1,6 +1,6 @@
-package com.lambda.modules
+package dev.oasis.modules
 
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import kotlin.math.floor
 import kotlinx.coroutines.delay
 import net.minecraft.entity.Entity
@@ -52,7 +52,8 @@ object EntityJesus : PluginModule(
             if (interval) return@safeListener
             val entity = player.ridingEntity ?: return@safeListener
             if (mc.gameSettings.keyBindSneak.isKeyDown || entity is EntityBoat) return@safeListener
-            if (isOnLand(entity)) {toLand = true; return@safeListener}
+            if (isOnLand(entity)) {
+                toLand = true; return@safeListener}
 
             if (world.getBlockState(BlockPos(entity.positionVector.add(.0, -.1 + entity.motionY, .0))).material.isLiquid
             ) {
@@ -66,7 +67,8 @@ object EntityJesus : PluginModule(
             if (interval) return@safeListener
             val entity = player.ridingEntity ?: return@safeListener
             if (mc.gameSettings.keyBindSneak.isKeyDown|| entity is EntityBoat) return@safeListener
-            if (isOnLand(entity)) {toLand = true; return@safeListener}
+            if (isOnLand(entity)) {
+                toLand = true; return@safeListener}
 
             if (entity.isInWater || world.getBlockState(entity.flooredPosition).material.isLiquid) {
                 toLand = false
@@ -87,7 +89,8 @@ object EntityJesus : PluginModule(
 
             val entity = player.ridingEntity ?: return@safeListener
             if (entity is EntityBoat) return@safeListener
-            if (isOnLand(entity)) {toLand = true; return@safeListener}
+            if (isOnLand(entity)) {
+                toLand = true; return@safeListener}
 
             if (mc.gameSettings.keyBindSneak.isKeyDown) {
                 entity.posY -= fakeY
@@ -124,7 +127,8 @@ object EntityJesus : PluginModule(
             if (it.packet !is SPacketPlayerPosLook) return@safeListener
             val entity = player.ridingEntity ?: return@safeListener
             if (entity is EntityBoat) return@safeListener
-            if (isOnLand(entity)) {toLand = true; return@safeListener}
+            if (isOnLand(entity)) {
+                toLand = true; return@safeListener}
 
             fakeY = player.posY - (it.packet as SPacketPlayerPosLook).y
         }

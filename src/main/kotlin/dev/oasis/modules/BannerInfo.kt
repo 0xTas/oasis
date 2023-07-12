@@ -1,6 +1,6 @@
-package com.lambda.modules
+package dev.oasis.modules
 
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import net.minecraft.block.BlockBanner
 import com.lambda.client.module.Category
 import net.minecraft.tileentity.TileEntityBanner
@@ -19,7 +19,7 @@ internal object BannerInfo : PluginModule(
     category = Category.MISC,
     pluginMain = Oasis
 ) {
-    // Event fires twice-per-click for me
+    // Event fires twice-per-click
     private var whyFireTwice = false
 
     init {

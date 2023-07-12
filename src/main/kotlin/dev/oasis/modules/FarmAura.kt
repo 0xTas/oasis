@@ -1,6 +1,6 @@
-package com.lambda.modules
+package dev.oasis.modules
 
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import kotlin.math.sqrt
 import kotlin.math.atan2
 import net.minecraft.block.*
@@ -48,15 +48,15 @@ internal object FarmAura: PluginModule(
     pluginMain = Oasis
 ) {
     private val page by setting("Page", value = Page.MODES)
-    private val shouldReplant by setting("Plant Seeds", value = true, {page == Page.MODES})
-    private val shouldBonemeal by setting("Use Bonemeal", value = true, {page == Page.MODES})
-    private val shouldHarvest by setting("Harvest Plants", value = true, {page == Page.MODES})
-    private val interactWheat by setting("Wheat", value = true, {page == Page.CROPS})
-    private val interactPotatoes by setting("Potatoes", value = true, {page == Page.CROPS})
-    private val interactCarrots by setting("Carrots", value = true, {page == Page.CROPS})
-    private val interactBeetroot by setting("Beetroot", value = true, {page == Page.CROPS})
-    private val interactReeds by setting("Sugar Cane", value = true, {page == Page.CROPS})
-    private val interactNetherWart by setting("Nether Wart", value = true, {page == Page.CROPS})
+    private val shouldReplant by setting("Plant Seeds", value = true, { page == Page.MODES })
+    private val shouldBonemeal by setting("Use Bonemeal", value = true, { page == Page.MODES })
+    private val shouldHarvest by setting("Harvest Plants", value = true, { page == Page.MODES })
+    private val interactWheat by setting("Wheat", value = true, { page == Page.CROPS })
+    private val interactPotatoes by setting("Potatoes", value = true, { page == Page.CROPS })
+    private val interactCarrots by setting("Carrots", value = true, { page == Page.CROPS })
+    private val interactBeetroot by setting("Beetroot", value = true, { page == Page.CROPS })
+    private val interactReeds by setting("Sugar Cane", value = true, { page == Page.CROPS })
+    private val interactNetherWart by setting("Nether Wart", value = true, { page == Page.CROPS })
     private val reachRange by setting(
         "Range",
         value = 3,

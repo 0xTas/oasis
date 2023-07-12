@@ -1,6 +1,6 @@
-package com.lambda.modules
+package dev.oasis.modules
 
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import kotlinx.coroutines.launch
 import net.minecraft.util.EnumFacing
 import net.minecraft.block.BlockSign

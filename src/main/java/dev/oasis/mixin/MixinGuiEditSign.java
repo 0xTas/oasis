@@ -1,11 +1,11 @@
-package com.lambda.mixin;
+package dev.oasis.mixin;
 
 import java.time.Instant;
 import java.time.Duration;
+import org.lwjgl.input.Keyboard;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
-import com.lambda.modules.SignatureSign;
-import org.lwjgl.input.Keyboard;
+import dev.oasis.modules.SignatureSign;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
 /**
- * @author 0xTas [@0xTas] <root@0xTas.dev>
+ * @author Tas [@0xTas] <root@0xTas.dev>
  */
 @Mixin(GuiEditSign.class)
 public abstract class MixinGuiEditSign extends GuiScreen {

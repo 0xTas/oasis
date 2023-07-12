@@ -1,7 +1,7 @@
-package com.lambda.commands
+package dev.oasis.commands
 
 import java.net.URL
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import java.time.Instant
 import java.time.Duration
 import java.util.TimeZone
@@ -48,7 +48,7 @@ object LastSeen : ClientCommand(
                 }
 
                 defaultScope.launch {
-                    val reqURL = apiURL+playerName
+                    val reqURL = apiURL +playerName
                     val req: HttpURLConnection
                     val res: String
                     try {

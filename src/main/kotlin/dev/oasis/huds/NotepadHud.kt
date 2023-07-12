@@ -1,6 +1,6 @@
-package com.lambda.huds
+package dev.oasis.huds
 
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import com.lambda.client.event.SafeClientEvent
 import com.lambda.client.util.color.ColorHolder
 import com.lambda.client.plugin.api.PluginLabelHud

@@ -1,7 +1,7 @@
-package com.lambda.modules
+package dev.oasis.modules
 
 import java.net.URL
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import kotlinx.coroutines.launch
 import java.net.HttpURLConnection
 import com.lambda.client.LambdaMod
@@ -63,6 +63,7 @@ internal object UpdateNotifier: PluginModule(
                         resURL = req.getHeaderField("Location")
                     } catch (e: Exception) {
                         LambdaMod.LOG.warn("Oasis Update Notifier failed to make a connection! - $e")
+                        notified = true
                         return@launch
                     }
 
@@ -74,7 +75,7 @@ internal object UpdateNotifier: PluginModule(
 
                         linkText.style = style
                         MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §7A new version of §2O§4a§3s§ei§5s §8[§fv§6$newVersion§8] §7is available§f!")
-                        MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §7(You have §fv§c$version§7)§f.")
+                        MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §7(You have §fv§c${version}§7)§f.")
                         MessageSendHelper.sendChatMessage(linkText)
                     }
                     notified = true
