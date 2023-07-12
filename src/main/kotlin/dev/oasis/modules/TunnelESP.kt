@@ -1,6 +1,6 @@
-package com.lambda.modules
+package dev.oasis.modules
 
-import com.lambda.Oasis
+import dev.oasis.Oasis
 import kotlinx.coroutines.launch
 import net.minecraft.block.BlockAir
 import net.minecraft.util.math.BlockPos
@@ -32,31 +32,32 @@ internal object TunnelESP: PluginModule(
 ){
     private val mode by setting(
         "Render Style", value = RenderMode.TUNNEL, description = "Recommend Tunnel for NR, Floor for OW")
-    private val fill by setting("Floor Fill", value = true, {mode == RenderMode.FLOOR})
-    private val outline by setting("Floor Outline", value = true, {mode == RenderMode.FLOOR})
-    private val tracer by setting("Floor Tracer", value = false, {mode == RenderMode.FLOOR})
+    private val fill by setting("Floor Fill", value = true, { mode == RenderMode.FLOOR })
+    private val outline by setting("Floor Outline", value = true, { mode == RenderMode.FLOOR })
+    private val tracer by setting("Floor Tracer", value = false, { mode == RenderMode.FLOOR })
     private val color by setting(
-        "Floor Color", ColorHolder(41, 118, 210), false, {mode == RenderMode.FLOOR})
+        "Floor Color", ColorHolder(41, 118, 210), false, { mode == RenderMode.FLOOR })
     private val aFill by setting(
-        "Floor Fill Opacity", value = 69, range = 0..255, step = 1, {fill && mode == RenderMode.FLOOR})
+        "Floor Fill Opacity", value = 69, range = 0..255, step = 1, { fill && mode == RenderMode.FLOOR })
     private val aOutline by setting(
-        "Floor Outline Opacity", value = 133, range = 0..255, step = 1, {outline && mode == RenderMode.FLOOR})
+        "Floor Outline Opacity", value = 133, range = 0..255, step = 1, { outline && mode == RenderMode.FLOOR })
     private val aTracer by setting(
-        "Floor Tracer Opacity", value = 20, range = 0..255, step = 1, {tracer && mode == RenderMode.FLOOR})
-    private val tunFill by setting("Tunnel Fill", value = true, {mode == RenderMode.TUNNEL})
-    private val tunOutline by setting("Tunnel Outline", value = true, {mode == RenderMode.TUNNEL})
-    private val tunTracer by setting("Tunnel Tracer", value = false, {mode == RenderMode.TUNNEL})
+        "Floor Tracer Opacity", value = 20, range = 0..255, step = 1, { tracer && mode == RenderMode.FLOOR })
+    private val tunFill by setting("Tunnel Fill", value = true, { mode == RenderMode.TUNNEL })
+    private val tunOutline by setting("Tunnel Outline", value = true, { mode == RenderMode.TUNNEL })
+    private val tunTracer by setting("Tunnel Tracer", value = false, { mode == RenderMode.TUNNEL })
     private val tunColor by setting(
-        "Tunnel Color", ColorHolder(41, 118, 210), false, {mode == RenderMode.TUNNEL})
+        "Tunnel Color", ColorHolder(41, 118, 210), false, { mode == RenderMode.TUNNEL })
     private val aTunFill by setting(
-        "Tunnel Fill Opacity", value = 48, range = 0..255, step = 1, {tunFill && mode == RenderMode.TUNNEL})
+        "Tunnel Fill Opacity", value = 48, range = 0..255, step = 1, { tunFill && mode == RenderMode.TUNNEL })
     private val aTunOutline by setting(
-        "Tunnel Outline Opacity", value = 24, range = 0..255, step = 1, {tunOutline && mode == RenderMode.TUNNEL})
+        "Tunnel Outline Opacity", value = 24, range = 0..255, step = 1, { tunOutline && mode == RenderMode.TUNNEL })
     private val aTunTracer by setting(
-        "Tunnel Tracer Opacity", value = 20, range = 0..255, step = 1, {tunTracer && mode == RenderMode.TUNNEL})
+        "Tunnel Tracer Opacity", value = 20, range = 0..255, step = 1, { tunTracer && mode == RenderMode.TUNNEL })
     private val chunkRange by setting(
         "Chunk Range", value = 5, range = 1..5, step = 1, description = "Decrease this (or allocate more RAM) if laggy"
     )
+    private val tickDelay by setting("Tick Delay", 420, 100..1000, 5, description = "Increase this if laggy")
 
     private val timer = TickTimer()
     private var renderer: ESPRenderer? = null
@@ -210,7 +211,7 @@ internal object TunnelESP: PluginModule(
             if (renderer == null) {
                 renderer = getRenderer()
             } else {
-                if (timer.tick(169)) {
+                if (timer.tick(tickDelay)) {
                     updateRenderer()
                 }
                 renderer?.render(false)
