@@ -1,10 +1,9 @@
-package com.lambda
+package dev.oasis
 
 import java.util.*
-import com.lambda.modules.*
-import com.lambda.huds.NotepadHud
-import com.lambda.commands.SegFault
-import com.lambda.commands.LastSeen
+import dev.oasis.modules.*
+import dev.oasis.commands.*
+import dev.oasis.huds.NotepadHud
 import com.lambda.client.plugin.api.Plugin
 
 
@@ -13,10 +12,11 @@ import com.lambda.client.plugin.api.Plugin
  */
 internal object Oasis : Plugin() {
     override fun onLoad() {
-        commands.add(LastSeen)
         modules.add(FarmAura)
         modules.add(OldSigns)
+        modules.add(AutoDoor)
         modules.add(TunnelESP)
+        commands.add(LastSeen)
         commands.add(SegFault)
         modules.add(ChatSigns)
         modules.add(BannerInfo)
