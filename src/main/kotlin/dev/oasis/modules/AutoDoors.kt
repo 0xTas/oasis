@@ -16,7 +16,6 @@ import it.unimi.dsi.fastutil.longs.LongArrayList
 import com.lambda.client.plugin.api.PluginModule
 import com.lambda.client.util.threads.safeListener
 import com.lambda.client.util.threads.defaultScope
-import com.lambda.client.util.MovementUtils.isMoving
 import com.lambda.client.util.text.MessageSendHelper
 import com.lambda.client.event.events.PlayerMoveEvent
 import com.lambda.client.event.events.ConnectionEvent
@@ -29,8 +28,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 /**
  * @author Tas [@0xTas] <root@0xTas.dev>
  */
-internal object AutoDoor : PluginModule(
-    name = "AutoDoor",
+internal object AutoDoors : PluginModule(
+    name = "AutoDoors",
     description = "Automatically closes doors behind you like a civilized steve",
     category = Category.PLAYER,
     pluginMain = Oasis
@@ -75,17 +74,9 @@ internal object AutoDoor : PluginModule(
             EnumFacing.UP -> if (pPos.y < pos.y) EnumFacing.DOWN else EnumFacing.UP
             EnumFacing.DOWN -> if (pPos.y > pos.y) EnumFacing.DOWN else EnumFacing.UP
         }
-
-        if (player.isMoving) {
-            player.connection.sendPacket(CPacketPlayer.PositionRotation(
-                player.posX, player.posY, player.posZ,
-                neededRots[0], neededRots[1], player.onGround
-            ))
-        } else {
-            player.connection.sendPacket(CPacketPlayer.Rotation(
-                neededRots[0], neededRots[1], player.onGround
-            ))
-        }
+        player.connection.sendPacket(CPacketPlayer.Rotation(
+            neededRots[0], neededRots[1], player.onGround
+        ))
         mc.playerController.processRightClickBlock(
             player,
             world,
@@ -95,16 +86,9 @@ internal object AutoDoor : PluginModule(
             EnumHand.MAIN_HAND
         )
         player.connection.sendPacket(CPacketAnimation(EnumHand.MAIN_HAND))
-        if (player.isMoving) {
-            player.connection.sendPacket(CPacketPlayer.PositionRotation(
-                player.posX, player.posY, player.posZ,
-                look, pitch, player.onGround
-            ))
-        } else {
-            player.connection.sendPacket(CPacketPlayer.Rotation(
-                look, pitch, player.onGround
-            ))
-        }
+        player.connection.sendPacket(CPacketPlayer.Rotation(
+            look, pitch, player.onGround
+        ))
     }
 
     private fun SafeClientEvent.getSurroundingDoors(): LongArrayList {
@@ -203,22 +187,23 @@ internal object AutoDoor : PluginModule(
                 when (movementDirection) {
                     EnumFacing.NORTH, EnumFacing.SOUTH -> {
                         if (world.getBlockState(frontPos.east()).block is BlockDoor) {
-                            val nextDoor = world.getBlockState(frontPos.east()).block as BlockDoor
+                            val nextDoor = world.getBlockState(frontPos.east()).block
                             if (!nextDoor.isPassable(world, frontPos.east())) interactDoor(frontPos.east(), movementDirection)
                         } else if (world.getBlockState(frontPos.west()).block is BlockDoor) {
-                            val nextDoor = world.getBlockState(frontPos.west()).block as BlockDoor
+                            val nextDoor = world.getBlockState(frontPos.west()).block
                             if (!nextDoor.isPassable(world, frontPos.west())) interactDoor(frontPos.west(), movementDirection)
                         }
                     }
-                    else -> {
+                    EnumFacing.EAST, EnumFacing.WEST -> {
                         if (world.getBlockState(frontPos.north()).block is BlockDoor) {
-                            val nextDoor = world.getBlockState(frontPos.north()).block as BlockDoor
+                            val nextDoor = world.getBlockState(frontPos.north()).block
                             if (!nextDoor.isPassable(world, frontPos.north())) interactDoor(frontPos.north(), movementDirection)
                         } else if (world.getBlockState(frontPos.south()).block is BlockDoor) {
-                            val nextDoor = world.getBlockState(frontPos.south()).block as BlockDoor
+                            val nextDoor = world.getBlockState(frontPos.south()).block
                             if (!nextDoor.isPassable(world, frontPos.south())) interactDoor(frontPos.south(), movementDirection)
                         }
                     }
+                    else -> {}
                 }
             }
             if (doorBehind is BlockDoor) {
@@ -226,22 +211,23 @@ internal object AutoDoor : PluginModule(
                 when (movementDirection) {
                     EnumFacing.NORTH, EnumFacing.SOUTH -> {
                         if (world.getBlockState(behindPos.east()).block is BlockDoor) {
-                            val nextDoor = world.getBlockState(behindPos.east()).block as BlockDoor
+                            val nextDoor = world.getBlockState(behindPos.east()).block
                             if (nextDoor.isPassable(world, behindPos.east())) interactDoor(behindPos.east(), movementDirection)
                         } else if (world.getBlockState(behindPos.west()).block is BlockDoor) {
-                            val nextDoor = world.getBlockState(behindPos.west()).block as BlockDoor
+                            val nextDoor = world.getBlockState(behindPos.west()).block
                             if (nextDoor.isPassable(world, behindPos.west())) interactDoor(behindPos.west(), movementDirection)
                         }
                     }
-                    else -> {
+                    EnumFacing.EAST, EnumFacing.WEST -> {
                         if (world.getBlockState(behindPos.north()).block is BlockDoor) {
-                            val nextDoor = world.getBlockState(behindPos.north()).block as BlockDoor
+                            val nextDoor = world.getBlockState(behindPos.north()).block
                             if (nextDoor.isPassable(world, behindPos.north())) interactDoor(behindPos.north(), movementDirection)
                         } else if (world.getBlockState(behindPos.south()).block is BlockDoor) {
-                            val nextDoor = world.getBlockState(frontPos.south()).block as BlockDoor
+                            val nextDoor = world.getBlockState(behindPos.south()).block
                             if (nextDoor.isPassable(world, behindPos.south())) interactDoor(behindPos.south(), movementDirection)
                         }
                     }
+                    else -> {}
                 }
             }
         }
