@@ -22,8 +22,7 @@ import com.lambda.client.util.text.MessageSendHelper
  * credits to https://2b2t.dev for the api
  */
 object LastSeen : ClientCommand(
-    name = "lastseen",
-    alias = arrayOf("ls", "seen"),
+    name = "ls",
     description = "Checks the last seen status of a 2b2t player"
 ) {
     private var lastUsed: Instant? = null
@@ -91,7 +90,7 @@ object LastSeen : ClientCommand(
                             val seen = output.replace(", ", "§f, at §2")
                             MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §2$playerName §fwas last seen on §2$seen.")
                         } else {
-                            MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §4That player has not been seen..")
+                            MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §4That player has not been seen§7..")
                         }
                     } catch (e: Exception) {
                         MessageSendHelper.sendChatMessage("§8[${Oasis.rCC()}☯§8] §4An error occurred. §fSee §2latest.log §ffor more info.")
