@@ -3,7 +3,9 @@
 
 Oasis is a plugin for the Minecraft 1.12.2 utility mod [Lambda](https://github.com/lambda-client/lambda).
 <br>
-It includes a collection of custom modules designed for use on the anarchy server 2B2T.
+It includes a collection of custom modules originally designed for use on the anarchy server 2B2T.
+<br><br>
+**[2b is on Minecraft version 1.19](https://2b2t.org/update/) as of August 14th 2023, meaning Lambda, and by extension Oasis, [are no longer useful on the server](https://github.com/0xTas/oasis#whats-next).**
 
 ### Modules
 | Name           | Description                                                                          | Usage                                                                                                                                                             | Why                                                                                                                                                                                                                                                                                                              |
@@ -35,9 +37,13 @@ It includes a collection of custom modules designed for use on the anarchy serve
 ---
 ### What's Next?
 
-I plan to support this plugin for the foreseeable future, as I get regular use out of it myself.<br>
-New modules may be added occasionally as I think of them and get them to a shareable state.<br>
-If you encounter any bugs or have any suggestions, feel free to [open an issue](https://github.com/0xTas/oasis/issues/new), and I'll address it when I can.
+Now that 2b2t has updated to 1.19, Lambda & Oasis are no longer useful or relevant on the server.<br>
+The plugin is still potentially useful on other 1.12 anarchy servers, so I wont yet archive it.<br>
+But, I don't play any of those servers, so I will likely not be actively updating this anymore.<br>
+If somebody still wants to submit issues or pull requests concerning minor fixes/additions, I'll take a look at them.<br>
+However, any larger continuations of the project should probably take place on a fork.<br>
+If Lambda ever does update to support 1.20+, I may update the plugin (where possible) to match.<br>
+However, certain exploits such as OldSigns and EntityJesus may be dead for good.<br>
 <br><br>
 > ### Disclaimer
 > This plugin modifies your in-game experience in a way that may be considered unfair in a multiplayer environment.<br>
