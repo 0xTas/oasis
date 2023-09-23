@@ -5,7 +5,8 @@ Oasis is a plugin for the Minecraft 1.12.2 utility mod [Lambda](https://github.c
 <br>
 It includes a collection of custom modules originally designed for use on the anarchy server 2B2T.
 <br><br>
-**[2b is on Minecraft version 1.19](https://2b2t.org/update/) as of August 14th 2023, meaning Lambda, and by extension Oasis, [are no longer useful on the server](https://github.com/0xTas/oasis#whats-next).**
+**[2b is on Minecraft version 1.19](https://2b2t.org/update/) as of August 14th 2023, meaning Lambda, and by extension Oasis, [are no longer useful on the server](https://github.com/0xTas/oasis#whats-next).**<br><br>
+**If you are looking for a 1.20+ replacement for Oasis, consider my [Meteor Client](https://meteorclient.com) addon [Stardust](https://github.com/0xTas/stardust).**
 
 ### Modules
 | Name           | Description                                                                          | Usage                                                                                                                                                             | Why                                                                                                                                                                                                                                                                                                              |
