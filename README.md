@@ -39,12 +39,7 @@ It includes a collection of custom modules originally designed for use on the an
 ### What's Next?
 
 Now that 2b2t has updated to 1.19, Lambda & Oasis are no longer useful or relevant on the server.<br>
-The plugin is still potentially useful on other 1.12 anarchy servers, so I wont yet archive it.<br>
-But, I don't play any of those servers, so I will likely not be actively updating this anymore.<br>
-If somebody still wants to submit issues or pull requests concerning minor fixes/additions, I'll take a look at them.<br>
-However, any larger continuations of the project should probably take place on a fork.<br>
 If Lambda ever does update to support 1.20+, I may update the plugin (where possible) to match.<br>
-However, certain exploits such as OldSigns and EntityJesus may be dead for good.<br>
 <br><br>
 > ### Disclaimer
 > This plugin modifies your in-game experience in a way that may be considered unfair in a multiplayer environment.<br>
